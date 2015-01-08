@@ -23,7 +23,7 @@ namespace DQDOS
             for (i = 0; i < LayoutTable.GetLength(0); i++)
             {
                 //if (MySearch.IsMatch(LayoutTable[i,1]))
-                if (LayoutTable[i,1].Contains(CommonName))
+                if (LayoutTable[i,1].ToUpper().Contains(CommonName.ToUpper()))
                 {
                     return LayoutTable[i,0];
                 }
@@ -40,7 +40,7 @@ namespace DQDOS
             for (i = 0; i < LayoutTable.GetLength(0); i++)
             {
                 //if (MySearch.IsMatch(LayoutTable[i, 0]))
-                if (LayoutTable[i,0].Contains(LayoutName))
+                if (LayoutTable[i,0].ToUpper().Contains(LayoutName.ToUpper()))
                 {
                     return LayoutTable[i, 1];
                 }
@@ -52,7 +52,7 @@ namespace DQDOS
 
     public static class DQDOSKeyboard
     {
-        public enum tKeyboardMode {Disabled = 0, DvorakOnly, DvorakQwerty };
+        public enum tKeyboardMode {FirstRun = -1, Disabled = 0, DvorakOnly, DvorakQwerty };
 
         public static tKeyboardMode GetLastKeyboardMode()
         {

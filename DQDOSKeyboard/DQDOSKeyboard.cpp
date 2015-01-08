@@ -11,7 +11,7 @@ namespace DQDOSKeyboard
 {
 	// Globals
 	const Int32 guiLayoutStringSize = (KL_NAMELENGTH + (KL_NAMELENGTH % 8) + 8);
-	tKeyboardMode geLastKeyboardMode = Disabled;
+	tKeyboardMode geLastKeyboardMode = FirstRun;
 
 	// Internal code
 	bool ChangeKeyboardLayout(LPCWSTR pwsLayoutName)

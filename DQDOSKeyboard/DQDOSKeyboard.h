@@ -8,7 +8,7 @@ using namespace System;
 
 namespace DQDOSKeyboard 
 {
-	typedef enum {Disabled = 0, DvorakOnly, DvorakQwerty} tKeyboardMode;
+	typedef enum {FirstRun = -1, Disabled = 0, DvorakOnly, DvorakQwerty} tKeyboardMode;
 
 	DLLEXPORT Int32 DQGetKeyboardLayoutBufferSize();
 	DLLEXPORT tKeyboardMode DQGetLastKeyboardMode();

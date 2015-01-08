@@ -49,18 +49,29 @@
             this.GetCurrentLayoutButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.KeyboardTypeGroupBox = new System.Windows.Forms.GroupBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.PrimaryKBTextBox = new System.Windows.Forms.TextBox();
             this.SecondaryKBTextBox = new System.Windows.Forms.TextBox();
+            this.PrimaryKBTextBox = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.ControlKeysGroupBox = new System.Windows.Forms.GroupBox();
+            this.ControlKeyCheckBox = new System.Windows.Forms.CheckBox();
+            this.AltKeyCheckBox = new System.Windows.Forms.CheckBox();
+            this.WindowsKeyCheckBox = new System.Windows.Forms.CheckBox();
             this.DQNotifyIconContextMenu.SuspendLayout();
             this.DQModeGroupBox.SuspendLayout();
             this.KeyboardTypeGroupBox.SuspendLayout();
+            this.ControlKeysGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // DQHideButton
             // 
-            this.DQHideButton.Location = new System.Drawing.Point(315, 241);
+            this.DQHideButton.Location = new System.Drawing.Point(296, 373);
             this.DQHideButton.Name = "DQHideButton";
             this.DQHideButton.Size = new System.Drawing.Size(103, 30);
             this.DQHideButton.TabIndex = 0;
@@ -70,7 +81,7 @@
             // 
             // DQQuitButton
             // 
-            this.DQQuitButton.Location = new System.Drawing.Point(424, 241);
+            this.DQQuitButton.Location = new System.Drawing.Point(445, 373);
             this.DQQuitButton.Name = "DQQuitButton";
             this.DQQuitButton.Size = new System.Drawing.Size(103, 30);
             this.DQQuitButton.TabIndex = 1;
@@ -151,12 +162,18 @@
             // 
             // DQModeGroupBox
             // 
+            this.DQModeGroupBox.Controls.Add(this.label8);
+            this.DQModeGroupBox.Controls.Add(this.label9);
+            this.DQModeGroupBox.Controls.Add(this.label6);
+            this.DQModeGroupBox.Controls.Add(this.label7);
+            this.DQModeGroupBox.Controls.Add(this.label5);
+            this.DQModeGroupBox.Controls.Add(this.label4);
             this.DQModeGroupBox.Controls.Add(this.DQModeFullEnableRadio);
             this.DQModeGroupBox.Controls.Add(this.DQModeDvorakOnlyRadio);
             this.DQModeGroupBox.Controls.Add(this.DQModeDisabledRadio);
             this.DQModeGroupBox.Location = new System.Drawing.Point(12, 12);
             this.DQModeGroupBox.Name = "DQModeGroupBox";
-            this.DQModeGroupBox.Size = new System.Drawing.Size(253, 132);
+            this.DQModeGroupBox.Size = new System.Drawing.Size(277, 228);
             this.DQModeGroupBox.TabIndex = 2;
             this.DQModeGroupBox.TabStop = false;
             this.DQModeGroupBox.Text = "DQ Keyboard Mode";
@@ -166,20 +183,20 @@
             this.DQModeFullEnableRadio.AutoSize = true;
             this.DQModeFullEnableRadio.Location = new System.Drawing.Point(27, 29);
             this.DQModeFullEnableRadio.Name = "DQModeFullEnableRadio";
-            this.DQModeFullEnableRadio.Size = new System.Drawing.Size(147, 17);
+            this.DQModeFullEnableRadio.Size = new System.Drawing.Size(238, 17);
             this.DQModeFullEnableRadio.TabIndex = 2;
-            this.DQModeFullEnableRadio.Text = "Dvorak-Qwerty Keyboard.";
+            this.DQModeFullEnableRadio.Text = "Dvorak-Qwerty (Primary keyboard with filters).";
             this.DQModeFullEnableRadio.UseVisualStyleBackColor = true;
             this.DQModeFullEnableRadio.CheckedChanged += new System.EventHandler(this.DQModeFullEnableRadio_CheckedChanged);
             // 
             // DQModeDvorakOnlyRadio
             // 
             this.DQModeDvorakOnlyRadio.AutoSize = true;
-            this.DQModeDvorakOnlyRadio.Location = new System.Drawing.Point(27, 64);
+            this.DQModeDvorakOnlyRadio.Location = new System.Drawing.Point(27, 94);
             this.DQModeDvorakOnlyRadio.Name = "DQModeDvorakOnlyRadio";
-            this.DQModeDvorakOnlyRadio.Size = new System.Drawing.Size(133, 17);
+            this.DQModeDvorakOnlyRadio.Size = new System.Drawing.Size(190, 17);
             this.DQModeDvorakOnlyRadio.TabIndex = 1;
-            this.DQModeDvorakOnlyRadio.Text = "Dvorak Keyboard only.";
+            this.DQModeDvorakOnlyRadio.Text = "Dvorak only (Primary and NO filter).";
             this.DQModeDvorakOnlyRadio.UseVisualStyleBackColor = true;
             this.DQModeDvorakOnlyRadio.CheckedChanged += new System.EventHandler(this.DQModeDvorakOnlyRadio_CheckedChanged);
             // 
@@ -187,25 +204,25 @@
             // 
             this.DQModeDisabledRadio.AutoSize = true;
             this.DQModeDisabledRadio.Checked = true;
-            this.DQModeDisabledRadio.Location = new System.Drawing.Point(27, 96);
+            this.DQModeDisabledRadio.Location = new System.Drawing.Point(27, 159);
             this.DQModeDisabledRadio.Name = "DQModeDisabledRadio";
-            this.DQModeDisabledRadio.Size = new System.Drawing.Size(195, 17);
+            this.DQModeDisabledRadio.Size = new System.Drawing.Size(168, 17);
             this.DQModeDisabledRadio.TabIndex = 0;
             this.DQModeDisabledRadio.TabStop = true;
-            this.DQModeDisabledRadio.Text = "DQ Keyboard disabled (just Qwerty).";
+            this.DQModeDisabledRadio.Text = "Qwerty (Secondary keyboard).";
             this.DQModeDisabledRadio.UseVisualStyleBackColor = true;
             this.DQModeDisabledRadio.CheckedChanged += new System.EventHandler(this.DQModeDisabledRadio_CheckedChanged);
             // 
             // DQCurrentKBTextBox
             // 
-            this.DQCurrentKBTextBox.Location = new System.Drawing.Point(427, 18);
+            this.DQCurrentKBTextBox.Location = new System.Drawing.Point(437, 288);
             this.DQCurrentKBTextBox.Name = "DQCurrentKBTextBox";
             this.DQCurrentKBTextBox.Size = new System.Drawing.Size(103, 20);
             this.DQCurrentKBTextBox.TabIndex = 4;
             // 
             // GetCurrentLayoutButton
             // 
-            this.GetCurrentLayoutButton.Location = new System.Drawing.Point(294, 12);
+            this.GetCurrentLayoutButton.Location = new System.Drawing.Point(304, 282);
             this.GetCurrentLayoutButton.Name = "GetCurrentLayoutButton";
             this.GetCurrentLayoutButton.Size = new System.Drawing.Size(103, 30);
             this.GetCurrentLayoutButton.TabIndex = 5;
@@ -217,7 +234,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(399, 21);
+            this.label1.Location = new System.Drawing.Point(409, 291);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(22, 13);
             this.label1.TabIndex = 6;
@@ -229,22 +246,30 @@
             this.KeyboardTypeGroupBox.Controls.Add(this.PrimaryKBTextBox);
             this.KeyboardTypeGroupBox.Controls.Add(this.label3);
             this.KeyboardTypeGroupBox.Controls.Add(this.label2);
-            this.KeyboardTypeGroupBox.Location = new System.Drawing.Point(12, 150);
+            this.KeyboardTypeGroupBox.Location = new System.Drawing.Point(295, 12);
             this.KeyboardTypeGroupBox.Name = "KeyboardTypeGroupBox";
-            this.KeyboardTypeGroupBox.Size = new System.Drawing.Size(253, 124);
+            this.KeyboardTypeGroupBox.Size = new System.Drawing.Size(253, 100);
             this.KeyboardTypeGroupBox.TabIndex = 7;
             this.KeyboardTypeGroupBox.TabStop = false;
-            this.KeyboardTypeGroupBox.Text = "Keyboard Types";
+            this.KeyboardTypeGroupBox.Text = "Keyboard Layouts";
             // 
-            // label2
+            // SecondaryKBTextBox
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(6, 29);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(109, 13);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "Primary Keyboard:";
+            this.SecondaryKBTextBox.Location = new System.Drawing.Point(140, 60);
+            this.SecondaryKBTextBox.Name = "SecondaryKBTextBox";
+            this.SecondaryKBTextBox.Size = new System.Drawing.Size(103, 20);
+            this.SecondaryKBTextBox.TabIndex = 10;
+            this.SecondaryKBTextBox.Text = "Qwerty";
+            this.SecondaryKBTextBox.Leave += new System.EventHandler(this.SecondardKBTextBox_Leave);
+            // 
+            // PrimaryKBTextBox
+            // 
+            this.PrimaryKBTextBox.Location = new System.Drawing.Point(140, 26);
+            this.PrimaryKBTextBox.Name = "PrimaryKBTextBox";
+            this.PrimaryKBTextBox.Size = new System.Drawing.Size(103, 20);
+            this.PrimaryKBTextBox.TabIndex = 8;
+            this.PrimaryKBTextBox.Text = "Dvorak";
+            this.PrimaryKBTextBox.Leave += new System.EventHandler(this.PrimaryKBTextBox_Leave);
             // 
             // label3
             // 
@@ -256,29 +281,124 @@
             this.label3.TabIndex = 9;
             this.label3.Text = "Secondary Keyboard:";
             // 
-            // PrimaryKBTextBox
+            // label2
             // 
-            this.PrimaryKBTextBox.Location = new System.Drawing.Point(140, 26);
-            this.PrimaryKBTextBox.Name = "PrimaryKBTextBox";
-            this.PrimaryKBTextBox.Size = new System.Drawing.Size(103, 20);
-            this.PrimaryKBTextBox.TabIndex = 8;
-            this.PrimaryKBTextBox.Text = "Dvorak";
-            this.PrimaryKBTextBox.Leave += new System.EventHandler(this.PrimaryKBTextBox_Leave);
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(6, 29);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(109, 13);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Primary Keyboard:";
             // 
-            // SecondaryKBTextBox
+            // label4
             // 
-            this.SecondaryKBTextBox.Location = new System.Drawing.Point(140, 60);
-            this.SecondaryKBTextBox.Name = "SecondaryKBTextBox";
-            this.SecondaryKBTextBox.Size = new System.Drawing.Size(103, 20);
-            this.SecondaryKBTextBox.TabIndex = 10;
-            this.SecondaryKBTextBox.Text = "Qwerty";
-            this.SecondaryKBTextBox.Leave += new System.EventHandler(this.SecondardKBTextBox_Leave);
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(60, 49);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(165, 13);
+            this.label4.TabIndex = 3;
+            this.label4.Text = "-Enables primary keyboard layout.";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(60, 62);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(209, 13);
+            this.label5.TabIndex = 4;
+            this.label5.Text = "-Enables secondary layout on control keys.";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(60, 127);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(112, 13);
+            this.label6.TabIndex = 6;
+            this.label6.Text = "-NO secondary layout.";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(60, 114);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(165, 13);
+            this.label7.TabIndex = 5;
+            this.label7.Text = "-Enables primary keyboard layout.";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(60, 179);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(181, 13);
+            this.label9.TabIndex = 7;
+            this.label9.Text = "-Enables secondary keyboard layout.";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(60, 192);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(104, 13);
+            this.label8.TabIndex = 8;
+            this.label8.Text = "-Effectively disabled.";
+            // 
+            // ControlKeysGroupBox
+            // 
+            this.ControlKeysGroupBox.Controls.Add(this.WindowsKeyCheckBox);
+            this.ControlKeysGroupBox.Controls.Add(this.AltKeyCheckBox);
+            this.ControlKeysGroupBox.Controls.Add(this.ControlKeyCheckBox);
+            this.ControlKeysGroupBox.Location = new System.Drawing.Point(296, 119);
+            this.ControlKeysGroupBox.Name = "ControlKeysGroupBox";
+            this.ControlKeysGroupBox.Size = new System.Drawing.Size(252, 121);
+            this.ControlKeysGroupBox.TabIndex = 8;
+            this.ControlKeysGroupBox.TabStop = false;
+            this.ControlKeysGroupBox.Text = "Enabled Control Keys";
+            // 
+            // ControlKeyCheckBox
+            // 
+            this.ControlKeyCheckBox.AutoSize = true;
+            this.ControlKeyCheckBox.Checked = true;
+            this.ControlKeyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ControlKeyCheckBox.Location = new System.Drawing.Point(22, 26);
+            this.ControlKeyCheckBox.Name = "ControlKeyCheckBox";
+            this.ControlKeyCheckBox.Size = new System.Drawing.Size(79, 17);
+            this.ControlKeyCheckBox.TabIndex = 0;
+            this.ControlKeyCheckBox.Text = "Control key";
+            this.ControlKeyCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // AltKeyCheckBox
+            // 
+            this.AltKeyCheckBox.AutoSize = true;
+            this.AltKeyCheckBox.Checked = true;
+            this.AltKeyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.AltKeyCheckBox.Location = new System.Drawing.Point(22, 58);
+            this.AltKeyCheckBox.Name = "AltKeyCheckBox";
+            this.AltKeyCheckBox.Size = new System.Drawing.Size(58, 17);
+            this.AltKeyCheckBox.TabIndex = 1;
+            this.AltKeyCheckBox.Text = "Alt key";
+            this.AltKeyCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // WindowsKeyCheckBox
+            // 
+            this.WindowsKeyCheckBox.AutoSize = true;
+            this.WindowsKeyCheckBox.Checked = true;
+            this.WindowsKeyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.WindowsKeyCheckBox.Location = new System.Drawing.Point(22, 90);
+            this.WindowsKeyCheckBox.Name = "WindowsKeyCheckBox";
+            this.WindowsKeyCheckBox.Size = new System.Drawing.Size(90, 17);
+            this.WindowsKeyCheckBox.TabIndex = 2;
+            this.WindowsKeyCheckBox.Text = "Windows key";
+            this.WindowsKeyCheckBox.UseVisualStyleBackColor = true;
             // 
             // DQMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(560, 289);
+            this.ClientSize = new System.Drawing.Size(560, 427);
+            this.Controls.Add(this.ControlKeysGroupBox);
             this.Controls.Add(this.KeyboardTypeGroupBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.GetCurrentLayoutButton);
@@ -297,6 +417,8 @@
             this.DQModeGroupBox.PerformLayout();
             this.KeyboardTypeGroupBox.ResumeLayout(false);
             this.KeyboardTypeGroupBox.PerformLayout();
+            this.ControlKeysGroupBox.ResumeLayout(false);
+            this.ControlKeysGroupBox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -327,6 +449,16 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox SecondaryKBTextBox;
         private System.Windows.Forms.TextBox PrimaryKBTextBox;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.GroupBox ControlKeysGroupBox;
+        private System.Windows.Forms.CheckBox WindowsKeyCheckBox;
+        private System.Windows.Forms.CheckBox AltKeyCheckBox;
+        private System.Windows.Forms.CheckBox ControlKeyCheckBox;
     }
 }
 
