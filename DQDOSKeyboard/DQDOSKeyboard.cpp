@@ -34,106 +34,210 @@
 
 #include "DQDOSKeyboard.h"
 
-namespace DQDOSKeyboard 
+namespace DQDOSKeyboard
 {
-	// Globals
-	const Int32 guiLayoutStringSize = (KL_NAMELENGTH + (KL_NAMELENGTH % 8) + 8);
-	tKeyboardMode geLastKeyboardMode = FirstRun;
 
-	// Internal code
-	bool ChangeKeyboardLayout(LPCWSTR pwsLayoutName)
-	{
-		// Make the given layout the only keyboard layout, and set it to default.
-		// This only changes the user's keyboard layout, doesn't do the filtering.
-		
-		HKL OrigHKL = GetKeyboardLayout(0);
-		HKL MyHKL = 0;
+// Globals
+static const Int32 guiLayoutStringSize = (KL_NAMELENGTH + (KL_NAMELENGTH % 8) + 8);
 
-		if ((pwsLayoutName == NULL) || (*pwsLayoutName == 0))
-			return false;
-		
-		MyHKL = LoadKeyboardLayout(pwsLayoutName, KLF_ACTIVATE); // | KLF_SUBSTITUTE_OK | KLF_REPLACELANG);
-		if (MyHKL == 0)
-			return false;
-
-		PostMessage(HWND_BROADCAST, WM_INPUTLANGCHANGEREQUEST, 0, (LPARAM) MyHKL);
-
-		// Purposefully ignoring any error codes that might happen from here out.
-		SystemParametersInfo(SPI_SETDEFAULTINPUTLANG, 0, (void *)&MyHKL, SPIF_SENDCHANGE);
-		if (OrigHKL != MyHKL)
-		{
-			UnloadKeyboardLayout(OrigHKL);
-		}
-
-		return true;
-	}
-
-	// external
-	Int32 DQGetKeyboardLayoutBufferSize()
-	{
-		return guiLayoutStringSize;
-	}
-
-	// external
-	tKeyboardMode DQGetLastKeyboardMode()
-	{
-		return geLastKeyboardMode;
-	}
-
-	// external
-	bool DQSetKeyboardMode(tKeyboardMode KeyboardMode, LPCWSTR pwsPrimaryLayout, LPCWSTR pwsSecondaryLayout)
-	{
-		bool Result = false;
-
-		if ((pwsPrimaryLayout == NULL) || (pwsSecondaryLayout == NULL)
-			|| (*pwsPrimaryLayout == 0) || (*pwsSecondaryLayout == 0))
-		{
-			return false;
-		}
-		
-		switch (KeyboardMode)
-		{
-			case DvorakQwerty:
-				Result = ChangeKeyboardLayout(pwsPrimaryLayout);
-				if (Result == false)
-					return false;
-				break;
-
-			case DvorakOnly:
-				Result = ChangeKeyboardLayout(pwsPrimaryLayout);
-				if (Result == false)
-					return false;
-				break;
-
-			case Disabled:
-				Result = ChangeKeyboardLayout(pwsSecondaryLayout);
-				if (Result == false)
-					return false;
-				break;
-
-			default:
-				return false;
-				break;
-		}
-
-		geLastKeyboardMode = KeyboardMode;
-		return true;
-	}
-
-	// external
-	bool DQGetCurrentKeyboardLayout(int iLayoutSize, LPSTR psLayoutName)
-	{
-		HKL hLayout = 0;
-		BOOL Result = false;
-
-		if (iLayoutSize < KL_NAMELENGTH + 1)
-			return false;
-
-		Result = GetKeyboardLayoutNameA(psLayoutName);
-		if (Result == FALSE) // success
-			return false;
-
-		return true;
-	}
+// Global and shared between all instances
+#pragma data_seg(".DQDOSShared")
 	
+static volatile tKeyboardMode geLastKeyboardMode = FirstRun;
+static volatile HKL gPrimaryHKL = 0;
+static volatile HKL gSecondaryHKL = 0;
+
+static volatile HINSTANCE ghInstDLL = NULL;
+static volatile HHOOK ghFilterHook = NULL;
+static volatile bool gIsMyKeyCode[256];
+
+#pragma data_seg()
+
+/*******************************
+ * Internal code starts here.  *
+ *******************************/
+
+#pragma unmanaged
+
+LRESULT CALLBACK DQDOSKeyFilter(int code, WPARAM wparam, LPARAM lparam)
+{
+	if (code >= 0)
+	{
+		// TODO: Filter!
+	}
+
+	return CallNextHookEx(ghFilterHook, code, wparam, lparam);
+}
+
+bool EnableFilterHook()
+{
+	if (ghFilterHook != NULL)
+		return false;
+
+	ghFilterHook = SetWindowsHookEx(WH_KEYBOARD, DQDOSKeyFilter, ghInstDLL, 0);
+
+	return true;
+}
+
+bool DisableFilterHook()
+{
+	if (ghFilterHook != NULL)
+	{
+		UnhookWindowsHookEx(ghFilterHook);
+	}
+
+	ghFilterHook = NULL;
+
+	return true;
+}
+
+#pragma managed
+
+bool ChangeKeyboardLayout(LPCWSTR pwsPrimaryLayoutName, LPCWSTR pwsSecondaryLayoutName)
+{
+	// Sets the keyboard layouts as requested, ensuring primary is the active layout.
+	// Unloads any layouts no longer needed.
+
+	// This may have to be modified for Win8, "Activate" means it sticks for the entire system.
+	// Currently coded for Win7.
+
+	HKL OrigHKL = GetKeyboardLayout(0);
+	HKL OrigSecHKL = gSecondaryHKL;
+	HKL MyHKL = 0;
+
+	// Test inputs
+	if ((pwsPrimaryLayoutName == NULL) || (*pwsPrimaryLayoutName == '\0'))
+		return false;
+
+	// First, load the secondary layout (if necessary).
+	// This could be zero (meaning failure) and we have to watch (i.e. ignore) during filtering.
+	if (pwsSecondaryLayoutName != NULL)
+	{
+		gSecondaryHKL = LoadKeyboardLayout(pwsSecondaryLayoutName, 0);
+	}
+	else
+	{
+		gSecondaryHKL = 0;
+	}
+
+	// Now load the Primary layout.
+	MyHKL = LoadKeyboardLayout(pwsPrimaryLayoutName, KLF_ACTIVATE | KLF_REORDER); // | KLF_REPLACELANG);
+	if (MyHKL == 0)
+		return false;
+	gPrimaryHKL = MyHKL;
+
+	// Tell other processes of the new primary layout and set it as default.
+	PostMessage(HWND_BROADCAST, WM_INPUTLANGCHANGEREQUEST, 0, (LPARAM)MyHKL);
+	SystemParametersInfo(SPI_SETDEFAULTINPUTLANG, 0, (void *)&MyHKL, SPIF_SENDCHANGE);
+
+	// Unload unneeded layouts if it changed (this ensures all processes accept the new layout).
+	if ((OrigHKL != gPrimaryHKL) && (OrigHKL != gSecondaryHKL))
+	{
+		UnloadKeyboardLayout(OrigHKL);
+	}
+	if ((pwsSecondaryLayoutName == NULL) && (OrigSecHKL != 0))
+	{
+		UnloadKeyboardLayout(OrigSecHKL);
+	}
+		
+	return true;
+}
+	
+// external
+Int32 DQGetKeyboardLayoutBufferSize()
+{
+	return guiLayoutStringSize;
+}
+
+// external
+tKeyboardMode DQGetLastKeyboardMode()
+{
+	return geLastKeyboardMode;
+}
+
+// external
+bool DQSetKeyboardMode(tKeyboardMode KeyboardMode, LPCWSTR pwsPrimaryLayout, LPCWSTR pwsSecondaryLayout)
+{
+	bool Result = false;
+
+	if ((pwsPrimaryLayout == NULL) || (pwsSecondaryLayout == NULL)
+		|| (*pwsPrimaryLayout == 0) || (*pwsSecondaryLayout == 0))
+	{
+		return false;
+	}
+		
+	// First set the layout.
+	switch (KeyboardMode)
+	{
+		case DvorakQwerty:
+			Result = ChangeKeyboardLayout(pwsPrimaryLayout, pwsSecondaryLayout);
+			EnableFilterHook();
+			if (Result == false)
+				return false;
+			break;
+
+		case DvorakOnly:
+			Result = ChangeKeyboardLayout(pwsPrimaryLayout, NULL);
+			DisableFilterHook();
+			if (Result == false)
+				return false;
+			break;
+
+		case Disabled:
+			Result = ChangeKeyboardLayout(pwsSecondaryLayout, NULL);
+			DisableFilterHook();
+			if (Result == false)
+				return false;
+			break;
+
+		default:
+			return false;
+			break;
+	}
+	geLastKeyboardMode = KeyboardMode;
+
+	// Second set or release the keyboard hook.
+		
+	// All done!
+	return true;
+}
+
+// external
+bool DQGetCurrentKeyboardLayout(int iLayoutSize, LPWSTR pwsLayoutName)
+{
+	HKL hLayout = 0;
+	BOOL Result = false;
+
+	if (iLayoutSize < KL_NAMELENGTH + 1)
+		return false;
+
+	Result = GetKeyboardLayoutName(pwsLayoutName);
+	if (Result == FALSE) // success
+		return false;
+
+	return true;
+}
+
+} // namespace DQDOSKeyboard
+
+#pragma unmanaged
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+{
+	switch (fdwReason)
+	{
+	case DLL_PROCESS_DETACH:
+		DQDOSKeyboard::DisableFilterHook();
+		break;
+
+	case DLL_PROCESS_ATTACH:
+		DQDOSKeyboard::ghInstDLL = hinstDLL;
+		break;
+
+	default:
+		// Currently do nothing.
+		break;
+	}
+
+	return TRUE;
 }

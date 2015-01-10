@@ -119,13 +119,7 @@ namespace DQDOS
             [MarshalAs(UnmanagedType.LPWStr)] String pwsPrimaryLayout, 
             [MarshalAs(UnmanagedType.LPWStr)] String pwsSecondaryLayout);
 
-        [DllImport("DQDOSKeyboard.dll")]
+        [DllImport("DQDOSKeyboard.dll", CharSet = CharSet.Unicode)]
         private static extern bool DQGetCurrentKeyboardLayout(int iLayoutSize, StringBuilder pwsLayoutName);
-
-        //[DllImport("DQDOSKeyboard.dll")]
-        //private static extern bool DQSetPrimaryKeyboardLayout([MarshalAs(UnmanagedType.LPStr)] String pcLayout);
-
-        //[DllImport("DQDOSKeyboard.dll")]
-        //private static extern bool DQSetSecondaryKeyboardLayout([MarshalAs(UnmanagedType.LPStr)] String pcLayout);
     }
 }

@@ -37,5 +37,5 @@ namespace DQDOSKeyboard
 	DLLEXPORT Int32 DQGetKeyboardLayoutBufferSize();
 	DLLEXPORT tKeyboardMode DQGetLastKeyboardMode();
 	DLLEXPORT bool DQSetKeyboardMode(tKeyboardMode KeyboardMode, LPCWSTR pwsPrimaryLayout, LPCWSTR pwsSecondaryLayout);
-	DLLEXPORT bool DQGetCurrentKeyboardLayout(int iLayoutSize, LPSTR psLayoutName);
+	DLLEXPORT bool DQGetCurrentKeyboardLayout(int iLayoutSize, LPWSTR pwsLayoutName);
 }
