@@ -432,6 +432,7 @@
             this.Name = "DQMainForm";
             this.Text = "Derick\'s Dvorak-Qwerty Controller";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DQMainForm_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.DQMainForm_FormClosed);
             this.DQNotifyIconContextMenu.ResumeLayout(false);
             this.DQModeGroupBox.ResumeLayout(false);
             this.DQModeGroupBox.PerformLayout();

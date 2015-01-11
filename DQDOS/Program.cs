@@ -24,6 +24,7 @@
  *                                                                       *
  *************************************************************************/
 
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,8 @@ namespace DQDOS
 {
     static class Program
     {
+        static DQMainForm MainForm = null;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -42,7 +45,18 @@ namespace DQDOS
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new DQMainForm());
+
+            MainForm = new DQMainForm();
+            MainForm.DQLoadAppSettings();
+
+            SystemEvents.SessionEnded += SystemEvents_SessionEnded;
+
+            Application.Run();
+        }
+
+        static void SystemEvents_SessionEnded(object sender, SessionEndedEventArgs e)
+        {
+            MainForm.DQSystemShutdown();
         }
     }
 }

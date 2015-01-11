@@ -29,14 +29,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 // TODO LIST:
-// Save state when exiting.
-// Load state on open, set defaults if no state found.
+// DONE -- Save state when exiting.
+// DONE -- Load state on open, set defaults if no state found.
 // Be sure it exits cleanly (and saves state) when exiting.
 // Considering saving state periodically because clean exits don't always happen.
 // Figure out if Windows key filtering can be done properly.
@@ -50,6 +52,89 @@ namespace DQDOS
 {
     public partial class DQMainForm : Form
     {
+        
+        public class SavedSettings
+        {
+            // This class obviously saves / loads state between executions, but it also it the source of defaults.
+            // If the class can't load state, it passes back defaults to the form.
+
+            private static String SavedSettingsFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\DQDOS\\";
+            private const String SavedSettingsFileName = "DQDOSSettings.xml";
+
+            public String PrimaryLayoutName = "00010409";
+            public String SecondaryLayoutName = "00000409";
+            public DQDOSKeyboard.tKeyboardMode LastKeyboardMode = DQDOSKeyboard.tKeyboardMode.Disabled;
+            public bool IsControlFiltered = true;
+            public bool IsAltFiltered = true;
+            public bool IsWinFiltered = true;
+            public bool IsAppHidden = false;
+            public String LastSaveTime = "";
+
+            public static SavedSettings LoadAppSettings()
+            {
+                SavedSettings Myself = null;
+                FileStream MyFileStream = null;
+                XmlSerializer MySerializer = null;
+                String FullFileName = SavedSettingsFolder + SavedSettingsFileName;
+
+                try
+                {
+                    MySerializer = new XmlSerializer(typeof(SavedSettings));
+                    MyFileStream = new FileStream(FullFileName, FileMode.Open);
+
+                    Myself = (SavedSettings) MySerializer.Deserialize(MyFileStream);
+                }
+                catch
+                {
+                    // do nothing...
+                }
+                finally
+                {
+                    if (MyFileStream != null)
+                        MyFileStream.Close();
+
+                    if (Myself == null)
+                        Myself = new SavedSettings(); // return defaults if we didn't find anything.
+                }
+
+                return Myself;
+            }
+
+            public bool SaveAppSettings()
+            {
+                bool IsSuccess = false;
+                StreamWriter MyFileWriter = null;
+                XmlSerializer MySerializer = null;
+                String FullFileName = SavedSettingsFolder + SavedSettingsFileName;
+                LastSaveTime = DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss");
+
+                try
+                {
+                    System.IO.Directory.CreateDirectory(SavedSettingsFolder);
+
+                    MySerializer = new XmlSerializer(typeof(SavedSettings));
+                    MyFileWriter = new StreamWriter(FullFileName, false);
+
+                    MySerializer.Serialize(MyFileWriter, this);
+
+                    IsSuccess = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                    IsSuccess = false;
+                }
+                finally
+                {
+                    if (MyFileWriter != null)
+                    {
+                        MyFileWriter.Close();
+                    }
+                }
+
+                return IsSuccess;
+            }
+        }
 
         private bool m_bUserClosing = false;
         private bool m_bSystemClosing = false;
@@ -60,14 +145,84 @@ namespace DQDOS
 
             this.Icon = Properties.Resources.DQEnabled;
 
-            // TODO: Load in last state of application.
+            //DQLoadAppSettings();
+        }
+        
+        public void DQSaveAppSettings()
+        {
+            SavedSettings MySavedSettings = new SavedSettings();
 
-            // TODO: Make this defaults if no previous state found. 
-            DQModeDisabledRadio.Checked = true;
-            SetKeyboardLayoutTextBox("Dvorak", PrimaryKBTextBox);
-            SetKeyboardLayoutTextBox("Qwerty", SecondaryKBTextBox);
+            MySavedSettings.LastKeyboardMode = DQDOSKeyboard.GetLastKeyboardMode();
+            MySavedSettings.PrimaryLayoutName = DQDOSKeyboardLayout.CommonNameToLayoutName(PrimaryKBTextBox.Text);
+            if (MySavedSettings.PrimaryLayoutName == null)
+                MySavedSettings.PrimaryLayoutName = PrimaryKBTextBox.Text;
+            MySavedSettings.SecondaryLayoutName = DQDOSKeyboardLayout.CommonNameToLayoutName(SecondaryKBTextBox.Text);
+            if (MySavedSettings.SecondaryLayoutName == null)
+                MySavedSettings.SecondaryLayoutName = SecondaryKBTextBox.Text;
+            MySavedSettings.IsControlFiltered = ControlKeyCheckBox.Checked;
+            MySavedSettings.IsAltFiltered = AltKeyCheckBox.Checked;
+            MySavedSettings.IsWinFiltered = WindowsKeyCheckBox.Checked;
+            MySavedSettings.IsAppHidden = ! (this.Visible);
+
+            MySavedSettings.SaveAppSettings();
+        }
+
+        public void DQLoadAppSettings()
+        {
+            SavedSettings MySavedSettings = SavedSettings.LoadAppSettings();
+
+            if (MySavedSettings == null)
+                throw new Exception("Unable to load default settings or a saved settings file, DQDOS will terminate.");
+
+            SetKeyboardLayoutTextBox(MySavedSettings.PrimaryLayoutName, PrimaryKBTextBox);
+            SetKeyboardLayoutTextBox(MySavedSettings.SecondaryLayoutName, SecondaryKBTextBox);
+            ControlKeyCheckBox.Checked = MySavedSettings.IsControlFiltered;
+            AltKeyCheckBox.Checked = MySavedSettings.IsAltFiltered;
+            WindowsKeyCheckBox.Checked = MySavedSettings.IsWinFiltered;
+
             SetFilteredControlKeys();
+
+            // This will trigger events that will set the mode too.
+            switch (MySavedSettings.LastKeyboardMode)
+            {
+                case DQDOSKeyboard.tKeyboardMode.Disabled:
+                    DQModeDisabledRadio.Checked = true;
+                    break;
+
+                case DQDOSKeyboard.tKeyboardMode.DvorakOnly:
+                    DQModeDvorakOnlyRadio.Checked = true;
+                    break;
+
+                case DQDOSKeyboard.tKeyboardMode.DvorakQwerty:
+                    DQModeFullEnableRadio.Checked = true;
+                    break;
+            }
+
+            if (MySavedSettings.IsAppHidden)
+            {
+                // The "show" then "hide" seems like a hack, but without showing the form once, my shutdown message box 
+                // warning doesn't launch. That is, if the forms stays hidden the whole time, then the NotifyIcon exit 
+                // function just exits abruptly but doesn't stop the application message loop because it doesn't call the
+                // "closing" and "closed" events.
+
+                this.Opacity = 0;
+                ShowGUI();
+                HideGUI();
+                this.Opacity = 100;
+            }
+            else
+            {
+                ShowGUI();
+            }
+
             DQChangeKeyboardMode();
+        }
+
+        private void DQMainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            DQSaveAppSettings();
+
+            Application.Exit();
         }
 
         public void DQSystemShutdown()
