@@ -108,6 +108,11 @@ namespace DQDOS
             return null;
         }
 
+        public static bool SetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsWinFiltered)
+        {
+            return DQSetFilteredSpecialKeys(IsControlFiltered, IsAltFiltered, IsWinFiltered);
+        }
+
         [DllImport("DQDOSKeyboard.dll")]
         private static extern Int32 DQGetKeyboardLayoutBufferSize();
 
@@ -121,5 +126,8 @@ namespace DQDOS
 
         [DllImport("DQDOSKeyboard.dll", CharSet = CharSet.Unicode)]
         private static extern bool DQGetCurrentKeyboardLayout(int iLayoutSize, StringBuilder pwsLayoutName);
+
+        [DllImport("DQDOSKeyboard.dll")]
+        private static extern bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsWinFiltered);
     }
 }

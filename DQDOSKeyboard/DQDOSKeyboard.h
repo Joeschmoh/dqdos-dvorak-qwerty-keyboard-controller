@@ -38,4 +38,5 @@ namespace DQDOSKeyboard
 	DLLEXPORT tKeyboardMode DQGetLastKeyboardMode();
 	DLLEXPORT bool DQSetKeyboardMode(tKeyboardMode KeyboardMode, LPCWSTR pwsPrimaryLayout, LPCWSTR pwsSecondaryLayout);
 	DLLEXPORT bool DQGetCurrentKeyboardLayout(int iLayoutSize, LPWSTR pwsLayoutName);
+	DLLEXPORT bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsWinFiltered);
 }

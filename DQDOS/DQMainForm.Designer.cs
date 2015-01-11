@@ -383,6 +383,7 @@
             this.WindowsKeyCheckBox.TabIndex = 2;
             this.WindowsKeyCheckBox.Text = "Windows key";
             this.WindowsKeyCheckBox.UseVisualStyleBackColor = true;
+            this.WindowsKeyCheckBox.CheckedChanged += new System.EventHandler(this.WindowsKeyCheckBox_CheckedChanged);
             // 
             // AltKeyCheckBox
             // 
@@ -396,6 +397,7 @@
             this.AltKeyCheckBox.TabIndex = 1;
             this.AltKeyCheckBox.Text = "Alt key";
             this.AltKeyCheckBox.UseVisualStyleBackColor = true;
+            this.AltKeyCheckBox.CheckedChanged += new System.EventHandler(this.AltKeyCheckBox_CheckedChanged);
             // 
             // ControlKeyCheckBox
             // 
@@ -409,6 +411,7 @@
             this.ControlKeyCheckBox.TabIndex = 0;
             this.ControlKeyCheckBox.Text = "Control key";
             this.ControlKeyCheckBox.UseVisualStyleBackColor = true;
+            this.ControlKeyCheckBox.CheckedChanged += new System.EventHandler(this.ControlKeyCheckBox_CheckedChanged);
             // 
             // DQMainForm
             // 

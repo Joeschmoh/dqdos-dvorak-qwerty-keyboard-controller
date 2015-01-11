@@ -34,6 +34,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+// TODO LIST:
+// Save state when exiting.
+// Load state on open, set defaults if no state found.
+// Be sure it exits cleanly (and saves state) when exiting.
+// Considering saving state periodically because clean exits don't always happen.
+// Figure out if Windows key filtering can be done properly.
+// Clean up the GUI
+// Get better icons.
+// TODO's throughout code.
+// Is there a way to set a qwerty mode when a key is held down?
+// Test, review, and clean up code.
+
 namespace DQDOS
 {
     public partial class DQMainForm : Form
@@ -54,6 +66,7 @@ namespace DQDOS
             DQModeDisabledRadio.Checked = true;
             SetKeyboardLayoutTextBox("Dvorak", PrimaryKBTextBox);
             SetKeyboardLayoutTextBox("Qwerty", SecondaryKBTextBox);
+            SetFilteredControlKeys();
             DQChangeKeyboardMode();
         }
 
@@ -279,6 +292,26 @@ namespace DQDOS
         private void SecondardKBTextBox_Leave(object sender, EventArgs e)
         {
             SetKeyboardLayoutTextBox(SecondaryKBTextBox.Text, SecondaryKBTextBox);
+        }
+
+        private void SetFilteredControlKeys()
+        {
+            DQDOSKeyboard.SetFilteredSpecialKeys(ControlKeyCheckBox.Checked, AltKeyCheckBox.Checked, WindowsKeyCheckBox.Checked);
+        }
+
+        private void ControlKeyCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetFilteredControlKeys();
+        }
+
+        private void AltKeyCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetFilteredControlKeys();
+        }
+
+        private void WindowsKeyCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetFilteredControlKeys();
         }
     }
 }
