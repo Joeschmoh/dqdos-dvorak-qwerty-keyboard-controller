@@ -28,6 +28,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -43,19 +44,34 @@ namespace DQDOS
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            bool MyMutexIsNew = false;
+            Mutex MyMutex = new Mutex(true, "DQDOS-Mutex", out MyMutexIsNew);
 
-            MainForm = new DQMainForm();
-            MainForm.DQLoadAppSettings();
+            if (MyMutexIsNew)
+            {
+                // Mutex is ours! Let's roll.
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
-            SystemEvents.SessionEnded += SystemEvents_SessionEnded;
+                MainForm = new DQMainForm();
+                MainForm.DQLoadAppSettings();
 
-            Application.Run();
+                SystemEvents.SessionEnded += SystemEvents_SessionEnded;
+
+                Application.Run();
+
+                SystemEvents.SessionEnded -= SystemEvents_SessionEnded;
+            }
+            else
+            {
+                // Someone else got our mutex, sad day.
+                MessageBox.Show("You already have DQDOS running and only one instance of DQDOS can run at a time.");
+            }
         }
 
         static void SystemEvents_SessionEnded(object sender, SessionEndedEventArgs e)
         {
+            // This tells the GUI user has logged out, rebooted, or shutdown and we need to exit immediately (without confirmation).
             MainForm.DQSystemShutdown();
         }
     }

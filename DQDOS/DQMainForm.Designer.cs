@@ -51,27 +51,37 @@
             this.DQModeFullEnableRadio = new System.Windows.Forms.RadioButton();
             this.DQModeDvorakOnlyRadio = new System.Windows.Forms.RadioButton();
             this.DQModeDisabledRadio = new System.Windows.Forms.RadioButton();
-            this.DQCurrentKBTextBox = new System.Windows.Forms.TextBox();
-            this.GetCurrentLayoutButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
             this.KeyboardTypeGroupBox = new System.Windows.Forms.GroupBox();
             this.SecondaryKBTextBox = new System.Windows.Forms.TextBox();
             this.PrimaryKBTextBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.ControlKeysGroupBox = new System.Windows.Forms.GroupBox();
-            this.WindowsKeyCheckBox = new System.Windows.Forms.CheckBox();
             this.AltKeyCheckBox = new System.Windows.Forms.CheckBox();
             this.ControlKeyCheckBox = new System.Windows.Forms.CheckBox();
+            this.PeriodicSaveTimer = new System.Windows.Forms.Timer(this.components);
+            this.ScrollLockGroupBox = new System.Windows.Forms.GroupBox();
+            this.ScrollLockDisabledCheckBox = new System.Windows.Forms.CheckBox();
+            this.ScrollLockQwertyCheckBox = new System.Windows.Forms.CheckBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.DQCurrentKBTextBox = new System.Windows.Forms.TextBox();
+            this.GetCurrentLayoutButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
             this.DQNotifyIconContextMenu.SuspendLayout();
             this.DQModeGroupBox.SuspendLayout();
             this.KeyboardTypeGroupBox.SuspendLayout();
             this.ControlKeysGroupBox.SuspendLayout();
+            this.ScrollLockGroupBox.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // DQHideButton
             // 
-            this.DQHideButton.Location = new System.Drawing.Point(296, 373);
+            this.DQHideButton.Location = new System.Drawing.Point(445, 384);
             this.DQHideButton.Name = "DQHideButton";
             this.DQHideButton.Size = new System.Drawing.Size(103, 30);
             this.DQHideButton.TabIndex = 0;
@@ -81,7 +91,7 @@
             // 
             // DQQuitButton
             // 
-            this.DQQuitButton.Location = new System.Drawing.Point(445, 373);
+            this.DQQuitButton.Location = new System.Drawing.Point(12, 384);
             this.DQQuitButton.Name = "DQQuitButton";
             this.DQQuitButton.Size = new System.Drawing.Size(103, 30);
             this.DQQuitButton.TabIndex = 1;
@@ -277,33 +287,6 @@
             this.DQModeDisabledRadio.UseVisualStyleBackColor = true;
             this.DQModeDisabledRadio.CheckedChanged += new System.EventHandler(this.DQModeDisabledRadio_CheckedChanged);
             // 
-            // DQCurrentKBTextBox
-            // 
-            this.DQCurrentKBTextBox.Location = new System.Drawing.Point(437, 288);
-            this.DQCurrentKBTextBox.Name = "DQCurrentKBTextBox";
-            this.DQCurrentKBTextBox.Size = new System.Drawing.Size(103, 20);
-            this.DQCurrentKBTextBox.TabIndex = 4;
-            // 
-            // GetCurrentLayoutButton
-            // 
-            this.GetCurrentLayoutButton.Location = new System.Drawing.Point(304, 282);
-            this.GetCurrentLayoutButton.Name = "GetCurrentLayoutButton";
-            this.GetCurrentLayoutButton.Size = new System.Drawing.Size(103, 30);
-            this.GetCurrentLayoutButton.TabIndex = 5;
-            this.GetCurrentLayoutButton.Text = "Current Keyboard";
-            this.GetCurrentLayoutButton.UseVisualStyleBackColor = true;
-            this.GetCurrentLayoutButton.Click += new System.EventHandler(this.GetCurrentLayoutButton_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(409, 291);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(22, 13);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "-->";
-            // 
             // KeyboardTypeGroupBox
             // 
             this.KeyboardTypeGroupBox.Controls.Add(this.SecondaryKBTextBox);
@@ -360,7 +343,6 @@
             // 
             // ControlKeysGroupBox
             // 
-            this.ControlKeysGroupBox.Controls.Add(this.WindowsKeyCheckBox);
             this.ControlKeysGroupBox.Controls.Add(this.AltKeyCheckBox);
             this.ControlKeysGroupBox.Controls.Add(this.ControlKeyCheckBox);
             this.ControlKeysGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -369,21 +351,7 @@
             this.ControlKeysGroupBox.Size = new System.Drawing.Size(252, 121);
             this.ControlKeysGroupBox.TabIndex = 8;
             this.ControlKeysGroupBox.TabStop = false;
-            this.ControlKeysGroupBox.Text = "Enabled Control Keys";
-            // 
-            // WindowsKeyCheckBox
-            // 
-            this.WindowsKeyCheckBox.AutoSize = true;
-            this.WindowsKeyCheckBox.Checked = true;
-            this.WindowsKeyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.WindowsKeyCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.WindowsKeyCheckBox.Location = new System.Drawing.Point(22, 90);
-            this.WindowsKeyCheckBox.Name = "WindowsKeyCheckBox";
-            this.WindowsKeyCheckBox.Size = new System.Drawing.Size(90, 17);
-            this.WindowsKeyCheckBox.TabIndex = 2;
-            this.WindowsKeyCheckBox.Text = "Windows key";
-            this.WindowsKeyCheckBox.UseVisualStyleBackColor = true;
-            this.WindowsKeyCheckBox.CheckedChanged += new System.EventHandler(this.WindowsKeyCheckBox_CheckedChanged);
+            this.ControlKeysGroupBox.Text = "Filtered Special Keys";
             // 
             // AltKeyCheckBox
             // 
@@ -391,7 +359,7 @@
             this.AltKeyCheckBox.Checked = true;
             this.AltKeyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.AltKeyCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AltKeyCheckBox.Location = new System.Drawing.Point(22, 58);
+            this.AltKeyCheckBox.Location = new System.Drawing.Point(22, 76);
             this.AltKeyCheckBox.Name = "AltKeyCheckBox";
             this.AltKeyCheckBox.Size = new System.Drawing.Size(58, 17);
             this.AltKeyCheckBox.TabIndex = 1;
@@ -405,7 +373,7 @@
             this.ControlKeyCheckBox.Checked = true;
             this.ControlKeyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ControlKeyCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ControlKeyCheckBox.Location = new System.Drawing.Point(22, 26);
+            this.ControlKeyCheckBox.Location = new System.Drawing.Point(22, 36);
             this.ControlKeyCheckBox.Name = "ControlKeyCheckBox";
             this.ControlKeyCheckBox.Size = new System.Drawing.Size(79, 17);
             this.ControlKeyCheckBox.TabIndex = 0;
@@ -413,16 +381,142 @@
             this.ControlKeyCheckBox.UseVisualStyleBackColor = true;
             this.ControlKeyCheckBox.CheckedChanged += new System.EventHandler(this.ControlKeyCheckBox_CheckedChanged);
             // 
+            // PeriodicSaveTimer
+            // 
+            this.PeriodicSaveTimer.Enabled = true;
+            this.PeriodicSaveTimer.Interval = 60000;
+            this.PeriodicSaveTimer.Tick += new System.EventHandler(this.PeriodicSaveTimer_Tick);
+            // 
+            // ScrollLockGroupBox
+            // 
+            this.ScrollLockGroupBox.Controls.Add(this.label11);
+            this.ScrollLockGroupBox.Controls.Add(this.label10);
+            this.ScrollLockGroupBox.Controls.Add(this.ScrollLockDisabledCheckBox);
+            this.ScrollLockGroupBox.Controls.Add(this.ScrollLockQwertyCheckBox);
+            this.ScrollLockGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ScrollLockGroupBox.Location = new System.Drawing.Point(296, 246);
+            this.ScrollLockGroupBox.Name = "ScrollLockGroupBox";
+            this.ScrollLockGroupBox.Size = new System.Drawing.Size(252, 121);
+            this.ScrollLockGroupBox.TabIndex = 9;
+            this.ScrollLockGroupBox.TabStop = false;
+            this.ScrollLockGroupBox.Text = "Scroll Lock Key";
+            // 
+            // ScrollLockDisabledCheckBox
+            // 
+            this.ScrollLockDisabledCheckBox.AutoSize = true;
+            this.ScrollLockDisabledCheckBox.Checked = true;
+            this.ScrollLockDisabledCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ScrollLockDisabledCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ScrollLockDisabledCheckBox.Location = new System.Drawing.Point(33, 59);
+            this.ScrollLockDisabledCheckBox.Name = "ScrollLockDisabledCheckBox";
+            this.ScrollLockDisabledCheckBox.Size = new System.Drawing.Size(180, 17);
+            this.ScrollLockDisabledCheckBox.TabIndex = 1;
+            this.ScrollLockDisabledCheckBox.Text = "Filter out actual scroll lock mode.";
+            this.ScrollLockDisabledCheckBox.UseVisualStyleBackColor = true;
+            this.ScrollLockDisabledCheckBox.CheckedChanged += new System.EventHandler(this.ScrollLockDisabledCheckBox_CheckedChanged);
+            // 
+            // ScrollLockQwertyCheckBox
+            // 
+            this.ScrollLockQwertyCheckBox.AutoSize = true;
+            this.ScrollLockQwertyCheckBox.Checked = true;
+            this.ScrollLockQwertyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ScrollLockQwertyCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ScrollLockQwertyCheckBox.Location = new System.Drawing.Point(12, 35);
+            this.ScrollLockQwertyCheckBox.Name = "ScrollLockQwertyCheckBox";
+            this.ScrollLockQwertyCheckBox.Size = new System.Drawing.Size(217, 17);
+            this.ScrollLockQwertyCheckBox.TabIndex = 0;
+            this.ScrollLockQwertyCheckBox.Text = "Scroll lock toggles Qwerty (secondary).**";
+            this.ScrollLockQwertyCheckBox.UseVisualStyleBackColor = true;
+            this.ScrollLockQwertyCheckBox.CheckedChanged += new System.EventHandler(this.ScrollLockQwertyCheckBox_CheckedChanged);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(12, 85);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(213, 13);
+            this.label10.TabIndex = 2;
+            this.label10.Text = "** These only work in Dvorak-Qwerty mode.";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(23, 100);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(209, 13);
+            this.label11.TabIndex = 3;
+            this.label11.Text = "The LED will still toggle even when filtered.";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.label13);
+            this.groupBox1.Controls.Add(this.label12);
+            this.groupBox1.Controls.Add(this.GetCurrentLayoutButton);
+            this.groupBox1.Controls.Add(this.DQCurrentKBTextBox);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Location = new System.Drawing.Point(12, 248);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(277, 119);
+            this.groupBox1.TabIndex = 10;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Get Keyboard Layout Strings";
+            // 
+            // DQCurrentKBTextBox
+            // 
+            this.DQCurrentKBTextBox.Location = new System.Drawing.Point(151, 34);
+            this.DQCurrentKBTextBox.Name = "DQCurrentKBTextBox";
+            this.DQCurrentKBTextBox.Size = new System.Drawing.Size(103, 20);
+            this.DQCurrentKBTextBox.TabIndex = 4;
+            // 
+            // GetCurrentLayoutButton
+            // 
+            this.GetCurrentLayoutButton.Location = new System.Drawing.Point(18, 28);
+            this.GetCurrentLayoutButton.Name = "GetCurrentLayoutButton";
+            this.GetCurrentLayoutButton.Size = new System.Drawing.Size(103, 30);
+            this.GetCurrentLayoutButton.TabIndex = 5;
+            this.GetCurrentLayoutButton.Text = "Current Keyboard";
+            this.GetCurrentLayoutButton.UseVisualStyleBackColor = true;
+            this.GetCurrentLayoutButton.Click += new System.EventHandler(this.GetCurrentLayoutButton_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(123, 37);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(22, 13);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "-->";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(18, 74);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(236, 13);
+            this.label12.TabIndex = 7;
+            this.label12.Text = "Set your keyboard in the control panel, then use ";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(18, 89);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(135, 13);
+            this.label13.TabIndex = 8;
+            this.label13.Text = "this button to get the string.";
+            // 
             // DQMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(560, 427);
+            this.ClientSize = new System.Drawing.Size(560, 425);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.ScrollLockGroupBox);
             this.Controls.Add(this.ControlKeysGroupBox);
             this.Controls.Add(this.KeyboardTypeGroupBox);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.GetCurrentLayoutButton);
-            this.Controls.Add(this.DQCurrentKBTextBox);
             this.Controls.Add(this.DQModeGroupBox);
             this.Controls.Add(this.DQQuitButton);
             this.Controls.Add(this.DQHideButton);
@@ -440,8 +534,11 @@
             this.KeyboardTypeGroupBox.PerformLayout();
             this.ControlKeysGroupBox.ResumeLayout(false);
             this.ControlKeysGroupBox.PerformLayout();
+            this.ScrollLockGroupBox.ResumeLayout(false);
+            this.ScrollLockGroupBox.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -462,9 +559,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem openGUIToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.TextBox DQCurrentKBTextBox;
-        private System.Windows.Forms.Button GetCurrentLayoutButton;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox KeyboardTypeGroupBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
@@ -477,9 +571,20 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.GroupBox ControlKeysGroupBox;
-        private System.Windows.Forms.CheckBox WindowsKeyCheckBox;
         private System.Windows.Forms.CheckBox AltKeyCheckBox;
         private System.Windows.Forms.CheckBox ControlKeyCheckBox;
+        private System.Windows.Forms.Timer PeriodicSaveTimer;
+        private System.Windows.Forms.GroupBox ScrollLockGroupBox;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.CheckBox ScrollLockDisabledCheckBox;
+        private System.Windows.Forms.CheckBox ScrollLockQwertyCheckBox;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TextBox DQCurrentKBTextBox;
+        private System.Windows.Forms.Button GetCurrentLayoutButton;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label12;
     }
 }
 

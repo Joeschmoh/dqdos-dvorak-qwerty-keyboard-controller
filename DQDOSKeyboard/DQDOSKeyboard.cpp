@@ -69,11 +69,13 @@ static volatile bool gIsControlDown = false;
 static volatile bool gIsAltDown = false;
 static volatile bool gIsLeftWinDown = false;
 static volatile bool gIsRightWinDown = false;
+static volatile bool gIsScrollLockEnabled = false;
 
 // Should we filter these keys?
 static volatile bool gIsControlFiltered = true;
 static volatile bool gIsAltFiltered = true;
-static volatile bool gIsWinFiltered = true;
+static volatile bool gIsScrollLockToggleEnabled = true;
+static volatile bool gIsScrollLockRemoved = true;
 
 #pragma data_seg()
 
@@ -88,7 +90,7 @@ bool IsSpecialKeyPressed()
 	// First test the special keys
 	if (((gIsControlFiltered & gIsControlDown) != false)
 		|| ((gIsAltFiltered & gIsAltDown) != false)
-		|| ((gIsWinFiltered & (gIsLeftWinDown | gIsRightWinDown)) != false))
+		|| ((gIsScrollLockToggleEnabled & gIsScrollLockEnabled) != false))
 	{
 		return true;
 	}
@@ -156,18 +158,17 @@ bool FilterTheKeys(int iCode, UINT uiVirtualKey, UINT uiKeyFlags)
 
 		case VK_LWIN:
 			gIsLeftWinDown = IsThisKeyDown;
-			if ((IsSpecialKeyPressed() == false) && (guiLastVKeyDown != 0))
-			{
-				SendFilteredKeyInput(guiLastVKeyDown, false);
-			}
 			break;
 
 		case VK_RWIN:
 			gIsRightWinDown = IsThisKeyDown;
-			if ((IsSpecialKeyPressed() == false) && (guiLastVKeyDown != 0))
-			{
-				SendFilteredKeyInput(guiLastVKeyDown, false);
-			}
+			break;
+
+		case VK_SCROLL:
+			if (IsThisKeyDown != false)
+				gIsScrollLockEnabled = !gIsScrollLockEnabled;
+			if (gIsScrollLockRemoved)
+				return 1;
 			break;
 
 		// here we filter.
@@ -420,11 +421,12 @@ bool DQGetCurrentKeyboardLayout(int iLayoutSize, LPWSTR pwsLayoutName)
 }
 
 // external
-bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsWinFiltered)
+bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsScrollLockQwertyEnabled, bool IsScrollLockDisabled)
 {
 	gIsControlFiltered = IsControlFiltered;
 	gIsAltFiltered = IsAltFiltered;
-	gIsWinFiltered = IsWinFiltered;
+	gIsScrollLockToggleEnabled = IsScrollLockQwertyEnabled;
+	gIsScrollLockRemoved = IsScrollLockDisabled;
 
 	return true;
 }

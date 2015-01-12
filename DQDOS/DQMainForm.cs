@@ -37,16 +37,23 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 
 // TODO LIST:
+// TODO -- Prevent scroll lock light from coming on? Or just resetting it so we are in sync in DQDOS.
+// TODO -- Test, review, and clean up code.
+// TODO -- Various TODOs Throughout code.
+// TODO -- Clean up the GUI or make a much better one. It works, not sure I like it.
+// TODO -- Get better icons.
+// TODO -- 3 states and then scroll lock mode -- could be confusing as a UI indicator, maybe better ideas in the future.
+// TODO -- Figure out Windows key filtering -- looks like you need to use LL Keyboard hook to do this.
+// TODO -- Get many more language IDs as "common names". Maybe make the list a file so it can be updated dynamically.
+// TODO -- Bubble Icon text when toggling scroll lock Qwerty mode? But means going from C++ DLL back to C# GUI.
+// ----------------------
 // DONE -- Save state when exiting.
 // DONE -- Load state on open, set defaults if no state found.
-// Be sure it exits cleanly (and saves state) when exiting.
-// Considering saving state periodically because clean exits don't always happen.
-// Figure out if Windows key filtering can be done properly.
-// Clean up the GUI
-// Get better icons.
-// TODO's throughout code.
-// Is there a way to set a qwerty mode when a key is held down?
-// Test, review, and clean up code.
+// DONE -- Be sure it exits cleanly (and saves state) when exiting.
+// DONE -- Considering saving state periodically because clean exits don't always happen.
+// DONE -- Remove windows filtering since it doesn't work until I can do it properly.
+// DONE -- Used Scroll lock -- Is there a way to set a qwerty mode when a key is held down?
+// DONE -- Added mutex so that only instance runs at a time.
 
 namespace DQDOS
 {
@@ -66,7 +73,8 @@ namespace DQDOS
             public DQDOSKeyboard.tKeyboardMode LastKeyboardMode = DQDOSKeyboard.tKeyboardMode.Disabled;
             public bool IsControlFiltered = true;
             public bool IsAltFiltered = true;
-            public bool IsWinFiltered = true;
+            public bool IsScrollLockQwertyModeEnabled = true;
+            public bool IsScrollLockRemoved = true;
             public bool IsAppHidden = false;
             public String LastSaveTime = "";
 
@@ -138,14 +146,13 @@ namespace DQDOS
 
         private bool m_bUserClosing = false;
         private bool m_bSystemClosing = false;
+        private DateTime m_LastSettingsSave = DateTime.UtcNow;
 
         public DQMainForm()
         {
             InitializeComponent();
 
             this.Icon = Properties.Resources.DQEnabled;
-
-            //DQLoadAppSettings();
         }
         
         public void DQSaveAppSettings()
@@ -161,10 +168,12 @@ namespace DQDOS
                 MySavedSettings.SecondaryLayoutName = SecondaryKBTextBox.Text;
             MySavedSettings.IsControlFiltered = ControlKeyCheckBox.Checked;
             MySavedSettings.IsAltFiltered = AltKeyCheckBox.Checked;
-            MySavedSettings.IsWinFiltered = WindowsKeyCheckBox.Checked;
+            MySavedSettings.IsScrollLockQwertyModeEnabled = ScrollLockQwertyCheckBox.Checked;
+            MySavedSettings.IsScrollLockRemoved = ScrollLockDisabledCheckBox.Checked;
             MySavedSettings.IsAppHidden = ! (this.Visible);
 
             MySavedSettings.SaveAppSettings();
+            m_LastSettingsSave = DateTime.UtcNow;
         }
 
         public void DQLoadAppSettings()
@@ -178,7 +187,8 @@ namespace DQDOS
             SetKeyboardLayoutTextBox(MySavedSettings.SecondaryLayoutName, SecondaryKBTextBox);
             ControlKeyCheckBox.Checked = MySavedSettings.IsControlFiltered;
             AltKeyCheckBox.Checked = MySavedSettings.IsAltFiltered;
-            WindowsKeyCheckBox.Checked = MySavedSettings.IsWinFiltered;
+            ScrollLockQwertyCheckBox.Checked = MySavedSettings.IsScrollLockQwertyModeEnabled;
+            ScrollLockDisabledCheckBox.Checked = MySavedSettings.IsScrollLockRemoved;
 
             SetFilteredControlKeys();
 
@@ -451,7 +461,7 @@ namespace DQDOS
 
         private void SetFilteredControlKeys()
         {
-            DQDOSKeyboard.SetFilteredSpecialKeys(ControlKeyCheckBox.Checked, AltKeyCheckBox.Checked, WindowsKeyCheckBox.Checked);
+            DQDOSKeyboard.SetFilteredSpecialKeys(ControlKeyCheckBox.Checked, AltKeyCheckBox.Checked, ScrollLockQwertyCheckBox.Checked, ScrollLockDisabledCheckBox.Checked);
         }
 
         private void ControlKeyCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -465,6 +475,24 @@ namespace DQDOS
         }
 
         private void WindowsKeyCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetFilteredControlKeys();
+        }
+
+        private void PeriodicSaveTimer_Tick(object sender, EventArgs e)
+        {
+            // TODO: If we want to be really sophisticated, we would save settings soon after they change.
+            // But I didn't build in any detection of changes. This was easier.
+            if (DateTime.UtcNow.Subtract(m_LastSettingsSave).TotalMinutes >= 60)
+                DQSaveAppSettings();
+        }
+
+        private void ScrollLockQwertyCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            SetFilteredControlKeys();
+        }
+
+        private void ScrollLockDisabledCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             SetFilteredControlKeys();
         }
