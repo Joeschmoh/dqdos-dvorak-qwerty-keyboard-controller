@@ -31,6 +31,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -76,6 +77,7 @@ namespace DQDOS
             public bool IsScrollLockQwertyModeEnabled = true;
             public bool IsScrollLockRemoved = true;
             public bool IsAppHidden = false;
+            public bool IsHiddenAppWarningShown = false;
             public String LastSaveTime = "";
 
             public static SavedSettings LoadAppSettings()
@@ -146,6 +148,7 @@ namespace DQDOS
 
         private bool m_bUserClosing = false;
         private bool m_bSystemClosing = false;
+        private bool m_IsHiddentWarningShown = false;
         private DateTime m_LastSettingsSave = DateTime.UtcNow;
 
         public DQMainForm()
@@ -171,6 +174,7 @@ namespace DQDOS
             MySavedSettings.IsScrollLockQwertyModeEnabled = ScrollLockQwertyCheckBox.Checked;
             MySavedSettings.IsScrollLockRemoved = ScrollLockDisabledCheckBox.Checked;
             MySavedSettings.IsAppHidden = ! (this.Visible);
+            MySavedSettings.IsHiddenAppWarningShown = m_IsHiddentWarningShown;
 
             MySavedSettings.SaveAppSettings();
             m_LastSettingsSave = DateTime.UtcNow;
@@ -183,13 +187,14 @@ namespace DQDOS
             if (MySavedSettings == null)
                 throw new Exception("Unable to load default settings or a saved settings file, DQDOS will terminate.");
 
+            m_IsHiddentWarningShown = MySavedSettings.IsHiddenAppWarningShown;
             SetKeyboardLayoutTextBox(MySavedSettings.PrimaryLayoutName, PrimaryKBTextBox);
             SetKeyboardLayoutTextBox(MySavedSettings.SecondaryLayoutName, SecondaryKBTextBox);
             ControlKeyCheckBox.Checked = MySavedSettings.IsControlFiltered;
             AltKeyCheckBox.Checked = MySavedSettings.IsAltFiltered;
             ScrollLockQwertyCheckBox.Checked = MySavedSettings.IsScrollLockQwertyModeEnabled;
             ScrollLockDisabledCheckBox.Checked = MySavedSettings.IsScrollLockRemoved;
-
+            
             SetFilteredControlKeys();
 
             // This will trigger events that will set the mode too.
@@ -241,6 +246,11 @@ namespace DQDOS
             this.Close();
         }
 
+        public void DoHiddenWarningBubble()
+        {
+            DQNotifyIcon.ShowBalloonTip(15000, "DQDOS", "DQDOS is still running and has moved to your tray. Click the icon to change settings or re-open.", ToolTipIcon.Info);
+        }
+
         private void ShowGUI()
         {
             this.Visible = true;
@@ -251,6 +261,11 @@ namespace DQDOS
         {
             this.Visible = false;
             openGUIToolStripMenuItem.Text = "Show GUI";
+            if (m_IsHiddentWarningShown == false)
+            {
+                DoHiddenWarningBubble();
+                m_IsHiddentWarningShown = true;
+            }
         }
 
         private void DQSyncModeRadioToContextMenu()
@@ -495,6 +510,28 @@ namespace DQDOS
         private void ScrollLockDisabledCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             SetFilteredControlKeys();
+        }
+
+        private void DQNotifyIcon_MouseClick(object sender, MouseEventArgs e)
+        {
+            MethodInfo mi = null;
+
+            // Taken from Internet so context menu behaves normally.
+            if (e.Button == MouseButtons.Left)
+            {
+                mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (mi != null)
+                    mi.Invoke(DQNotifyIcon, null);
+            }
+            
+            // This is how you would expect it to work, but the menu doesn't go away from it loses focus.
+            //DQNotifyIcon.ContextMenuStrip.Show(this, Control.MousePosition);
+        }
+
+        private void DQNotifyIcon_BalloonTipClicked(object sender, EventArgs e)
+        {
+            m_IsHiddentWarningShown = false;
+            ShowGUI();
         }
     }
 }

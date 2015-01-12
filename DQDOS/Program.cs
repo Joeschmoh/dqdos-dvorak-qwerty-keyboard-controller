@@ -65,7 +65,7 @@ namespace DQDOS
             else
             {
                 // Someone else got our mutex, sad day.
-                MessageBox.Show("You already have DQDOS running and only one instance of DQDOS can run at a time.");
+                MessageBox.Show("You already have DQDOS running and only one instance of DQDOS can run at a time.", "DQDOS");
             }
         }
 
