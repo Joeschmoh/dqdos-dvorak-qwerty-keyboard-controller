@@ -61,9 +61,7 @@
             this.ControlKeyCheckBox = new System.Windows.Forms.CheckBox();
             this.PeriodicSaveTimer = new System.Windows.Forms.Timer(this.components);
             this.ScrollLockGroupBox = new System.Windows.Forms.GroupBox();
-            this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
-            this.ScrollLockDisabledCheckBox = new System.Windows.Forms.CheckBox();
             this.ScrollLockQwertyCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label13 = new System.Windows.Forms.Label();
@@ -71,6 +69,8 @@
             this.GetCurrentLayoutButton = new System.Windows.Forms.Button();
             this.DQCurrentKBTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.WinKeyCheckBox = new System.Windows.Forms.CheckBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.DQNotifyIconContextMenu.SuspendLayout();
             this.DQModeGroupBox.SuspendLayout();
             this.KeyboardTypeGroupBox.SuspendLayout();
@@ -345,6 +345,7 @@
             // 
             // ControlKeysGroupBox
             // 
+            this.ControlKeysGroupBox.Controls.Add(this.WinKeyCheckBox);
             this.ControlKeysGroupBox.Controls.Add(this.AltKeyCheckBox);
             this.ControlKeysGroupBox.Controls.Add(this.ControlKeyCheckBox);
             this.ControlKeysGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -361,7 +362,7 @@
             this.AltKeyCheckBox.Checked = true;
             this.AltKeyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.AltKeyCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AltKeyCheckBox.Location = new System.Drawing.Point(22, 76);
+            this.AltKeyCheckBox.Location = new System.Drawing.Point(22, 57);
             this.AltKeyCheckBox.Name = "AltKeyCheckBox";
             this.AltKeyCheckBox.Size = new System.Drawing.Size(58, 17);
             this.AltKeyCheckBox.TabIndex = 1;
@@ -375,7 +376,7 @@
             this.ControlKeyCheckBox.Checked = true;
             this.ControlKeyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ControlKeyCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ControlKeyCheckBox.Location = new System.Drawing.Point(22, 36);
+            this.ControlKeyCheckBox.Location = new System.Drawing.Point(22, 27);
             this.ControlKeyCheckBox.Name = "ControlKeyCheckBox";
             this.ControlKeyCheckBox.Size = new System.Drawing.Size(79, 17);
             this.ControlKeyCheckBox.TabIndex = 0;
@@ -393,7 +394,6 @@
             // 
             this.ScrollLockGroupBox.Controls.Add(this.label11);
             this.ScrollLockGroupBox.Controls.Add(this.label10);
-            this.ScrollLockGroupBox.Controls.Add(this.ScrollLockDisabledCheckBox);
             this.ScrollLockGroupBox.Controls.Add(this.ScrollLockQwertyCheckBox);
             this.ScrollLockGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ScrollLockGroupBox.Location = new System.Drawing.Point(296, 246);
@@ -403,39 +403,15 @@
             this.ScrollLockGroupBox.TabStop = false;
             this.ScrollLockGroupBox.Text = "Scroll Lock Key";
             // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label11.Location = new System.Drawing.Point(23, 100);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(209, 13);
-            this.label11.TabIndex = 3;
-            this.label11.Text = "The LED will still toggle even when filtered.";
-            // 
             // label10
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(12, 85);
+            this.label10.Location = new System.Drawing.Point(9, 74);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(213, 13);
+            this.label10.Size = new System.Drawing.Size(203, 13);
             this.label10.TabIndex = 2;
-            this.label10.Text = "** These only work in Dvorak-Qwerty mode.";
-            // 
-            // ScrollLockDisabledCheckBox
-            // 
-            this.ScrollLockDisabledCheckBox.AutoSize = true;
-            this.ScrollLockDisabledCheckBox.Checked = true;
-            this.ScrollLockDisabledCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ScrollLockDisabledCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ScrollLockDisabledCheckBox.Location = new System.Drawing.Point(33, 59);
-            this.ScrollLockDisabledCheckBox.Name = "ScrollLockDisabledCheckBox";
-            this.ScrollLockDisabledCheckBox.Size = new System.Drawing.Size(180, 17);
-            this.ScrollLockDisabledCheckBox.TabIndex = 1;
-            this.ScrollLockDisabledCheckBox.Text = "Filter out actual scroll lock mode.";
-            this.ScrollLockDisabledCheckBox.UseVisualStyleBackColor = true;
-            this.ScrollLockDisabledCheckBox.CheckedChanged += new System.EventHandler(this.ScrollLockDisabledCheckBox_CheckedChanged);
+            this.label10.Text = "** This only work in Dvorak-Qwerty mode.";
             // 
             // ScrollLockQwertyCheckBox
             // 
@@ -459,9 +435,9 @@
             this.groupBox1.Controls.Add(this.DQCurrentKBTextBox);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(12, 248);
+            this.groupBox1.Location = new System.Drawing.Point(12, 246);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(277, 119);
+            this.groupBox1.Size = new System.Drawing.Size(277, 121);
             this.groupBox1.TabIndex = 10;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Get Keyboard Layout Strings";
@@ -499,6 +475,7 @@
             // 
             // DQCurrentKBTextBox
             // 
+            this.DQCurrentKBTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DQCurrentKBTextBox.Location = new System.Drawing.Point(151, 34);
             this.DQCurrentKBTextBox.Name = "DQCurrentKBTextBox";
             this.DQCurrentKBTextBox.Size = new System.Drawing.Size(103, 20);
@@ -513,6 +490,30 @@
             this.label1.Size = new System.Drawing.Size(22, 13);
             this.label1.TabIndex = 6;
             this.label1.Text = "-->";
+            // 
+            // WinKeyCheckBox
+            // 
+            this.WinKeyCheckBox.AutoSize = true;
+            this.WinKeyCheckBox.Checked = true;
+            this.WinKeyCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.WinKeyCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.WinKeyCheckBox.Location = new System.Drawing.Point(22, 87);
+            this.WinKeyCheckBox.Name = "WinKeyCheckBox";
+            this.WinKeyCheckBox.Size = new System.Drawing.Size(90, 17);
+            this.WinKeyCheckBox.TabIndex = 2;
+            this.WinKeyCheckBox.Text = "Windows key";
+            this.WinKeyCheckBox.UseVisualStyleBackColor = true;
+            this.WinKeyCheckBox.CheckedChanged += new System.EventHandler(this.WinKeyCheckBox_CheckedChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.Location = new System.Drawing.Point(22, 91);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(196, 13);
+            this.label11.TabIndex = 3;
+            this.label11.Text = "Use Shift-ScrLock to toggle Scroll Lock.";
             // 
             // DQMainForm
             // 
@@ -582,15 +583,15 @@
         private System.Windows.Forms.Timer PeriodicSaveTimer;
         private System.Windows.Forms.GroupBox ScrollLockGroupBox;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.CheckBox ScrollLockDisabledCheckBox;
         private System.Windows.Forms.CheckBox ScrollLockQwertyCheckBox;
-        private System.Windows.Forms.Label label11;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox DQCurrentKBTextBox;
         private System.Windows.Forms.Button GetCurrentLayoutButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.CheckBox WinKeyCheckBox;
+        private System.Windows.Forms.Label label11;
     }
 }
 

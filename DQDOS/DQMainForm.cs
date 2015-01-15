@@ -38,15 +38,14 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 
 // TODO LIST:
-// TODO -- Prevent scroll lock light from coming on? Or just resetting it so we are in sync in DQDOS.
 // TODO -- Test, review, and clean up code.
 // TODO -- Various TODOs Throughout code.
 // TODO -- Clean up the GUI or make a much better one. It works, not sure I like it.
 // TODO -- Get better icons.
 // TODO -- 3 states and then scroll lock mode -- could be confusing as a UI indicator, maybe better ideas in the future.
-// TODO -- Figure out Windows key filtering -- looks like you need to use LL Keyboard hook to do this.
 // TODO -- Get many more language IDs as "common names". Maybe make the list a file so it can be updated dynamically.
 // TODO -- Bubble Icon text when toggling scroll lock Qwerty mode? But means going from C++ DLL back to C# GUI.
+//         Or just make tray icon show this behavior. Still not sure how to do Callback asynchronously.
 // ----------------------
 // DONE -- Save state when exiting.
 // DONE -- Load state on open, set defaults if no state found.
@@ -55,6 +54,8 @@ using System.Xml.Serialization;
 // DONE -- Remove windows filtering since it doesn't work until I can do it properly.
 // DONE -- Used Scroll lock -- Is there a way to set a qwerty mode when a key is held down?
 // DONE -- Added mutex so that only instance runs at a time.
+// DONE -- Prevent scroll lock light from coming on? Or just resetting it so we are in sync in DQDOS.
+// DONE -- Figure out Windows key filtering -- looks like you need to use LL Keyboard hook to do this.
 
 namespace DQDOS
 {
@@ -74,6 +75,7 @@ namespace DQDOS
             public DQDOSKeyboard.tKeyboardMode LastKeyboardMode = DQDOSKeyboard.tKeyboardMode.Disabled;
             public bool IsControlFiltered = true;
             public bool IsAltFiltered = true;
+            public bool IsWinFiltered = true;
             public bool IsScrollLockQwertyModeEnabled = true;
             public bool IsScrollLockRemoved = true;
             public bool IsAppHidden = false;
@@ -171,8 +173,9 @@ namespace DQDOS
                 MySavedSettings.SecondaryLayoutName = SecondaryKBTextBox.Text;
             MySavedSettings.IsControlFiltered = ControlKeyCheckBox.Checked;
             MySavedSettings.IsAltFiltered = AltKeyCheckBox.Checked;
+            MySavedSettings.IsWinFiltered = WinKeyCheckBox.Checked;
             MySavedSettings.IsScrollLockQwertyModeEnabled = ScrollLockQwertyCheckBox.Checked;
-            MySavedSettings.IsScrollLockRemoved = ScrollLockDisabledCheckBox.Checked;
+            MySavedSettings.IsScrollLockRemoved = true;
             MySavedSettings.IsAppHidden = ! (this.Visible);
             MySavedSettings.IsHiddenAppWarningShown = m_IsHiddentWarningShown;
 
@@ -192,8 +195,8 @@ namespace DQDOS
             SetKeyboardLayoutTextBox(MySavedSettings.SecondaryLayoutName, SecondaryKBTextBox);
             ControlKeyCheckBox.Checked = MySavedSettings.IsControlFiltered;
             AltKeyCheckBox.Checked = MySavedSettings.IsAltFiltered;
+            WinKeyCheckBox.Checked = MySavedSettings.IsWinFiltered;
             ScrollLockQwertyCheckBox.Checked = MySavedSettings.IsScrollLockQwertyModeEnabled;
-            ScrollLockDisabledCheckBox.Checked = MySavedSettings.IsScrollLockRemoved;
             
             SetFilteredControlKeys();
 
@@ -282,6 +285,10 @@ namespace DQDOS
             Icon NewIcon = null;
             String PrimaryLayout = null; 
             String SecondaryLayout = null;
+            String LastPriLayout = null;
+            String LastSecLayout = null;
+
+            DQDOSKeyboard.GetLastKeyboardLayouts(out LastPriLayout, out LastSecLayout);
 
             PrimaryLayout = DQDOSKeyboardLayout.CommonNameToLayoutName(PrimaryKBTextBox.Text);
             if (PrimaryLayout == null)
@@ -310,7 +317,7 @@ namespace DQDOS
                 NewIcon = Properties.Resources.DQEnabled16x16;
             }
 
-            if (NewMode != OldMode) // TODO: Also check whether layouts have changed.
+            if ((NewMode != OldMode) || (! PrimaryLayout.Equals(LastPriLayout)) || (! SecondaryLayout.Equals(LastSecLayout)))
             {
                 if (DQDOSKeyboard.SetKeyboardMode(NewMode, PrimaryLayout, SecondaryLayout) == true)
                 {
@@ -467,16 +474,18 @@ namespace DQDOS
         private void PrimaryKBTextBox_Leave(object sender, EventArgs e)
         {
             SetKeyboardLayoutTextBox(PrimaryKBTextBox.Text, PrimaryKBTextBox);
+            DQChangeKeyboardMode();
         }
 
         private void SecondardKBTextBox_Leave(object sender, EventArgs e)
         {
             SetKeyboardLayoutTextBox(SecondaryKBTextBox.Text, SecondaryKBTextBox);
+            DQChangeKeyboardMode();
         }
 
         private void SetFilteredControlKeys()
         {
-            DQDOSKeyboard.SetFilteredSpecialKeys(ControlKeyCheckBox.Checked, AltKeyCheckBox.Checked, ScrollLockQwertyCheckBox.Checked, ScrollLockDisabledCheckBox.Checked);
+            DQDOSKeyboard.SetFilteredSpecialKeys(ControlKeyCheckBox.Checked, AltKeyCheckBox.Checked, WinKeyCheckBox.Checked, ScrollLockQwertyCheckBox.Checked, true);
         }
 
         private void ControlKeyCheckBox_CheckedChanged(object sender, EventArgs e)
@@ -489,11 +498,11 @@ namespace DQDOS
             SetFilteredControlKeys();
         }
 
-        private void WindowsKeyCheckBox_CheckedChanged(object sender, EventArgs e)
+        private void WinKeyCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             SetFilteredControlKeys();
         }
-
+        
         private void PeriodicSaveTimer_Tick(object sender, EventArgs e)
         {
             // TODO: If we want to be really sophisticated, we would save settings soon after they change.
@@ -503,11 +512,6 @@ namespace DQDOS
         }
 
         private void ScrollLockQwertyCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            SetFilteredControlKeys();
-        }
-
-        private void ScrollLockDisabledCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             SetFilteredControlKeys();
         }
@@ -532,6 +536,11 @@ namespace DQDOS
         {
             m_IsHiddentWarningShown = false;
             ShowGUI();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(DQDOSKeyboard.GetNumberAttachedProcs().ToString());
         }
     }
 }

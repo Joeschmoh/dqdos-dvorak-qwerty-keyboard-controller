@@ -36,7 +36,9 @@ namespace DQDOSKeyboard
 
 	DLLEXPORT Int32 DQGetKeyboardLayoutBufferSize();
 	DLLEXPORT tKeyboardMode DQGetLastKeyboardMode();
+	DLLEXPORT bool DQGetLastKeyboardLayouts(int iLayoutSize, LPWSTR pwsPrimaryLayout, LPWSTR pwsSecondaryLayout);
 	DLLEXPORT bool DQSetKeyboardMode(tKeyboardMode KeyboardMode, LPCWSTR pwsPrimaryLayout, LPCWSTR pwsSecondaryLayout);
 	DLLEXPORT bool DQGetCurrentKeyboardLayout(int iLayoutSize, LPWSTR pwsLayoutName);
-	DLLEXPORT bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsScrollLockQwertyEnabled, bool IsScrollLockDisabled);
+	DLLEXPORT bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsWinFiltered, bool IsScrollLockQwertyEnabled, bool IsScrollLockDisabled);
+	DLLEXPORT UINT DQGetNumberAttachedProcs();
 }

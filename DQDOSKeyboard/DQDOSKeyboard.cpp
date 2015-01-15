@@ -30,6 +30,7 @@
 #include "stdafx.h"
 
 #include <cstdlib>
+#include <stdio.h>
 #include <Windows.h>
 
 #include "DQDOSKeyboard.h"
@@ -53,10 +54,13 @@ static const Int32 guiLayoutStringSize = (KL_NAMELENGTH + (KL_NAMELENGTH % 8) + 
 static volatile tKeyboardMode geLastKeyboardMode = FirstRun;
 static volatile HKL gPrimaryHKL = 0;
 static volatile HKL gSecondaryHKL = 0;
+static WCHAR gwsLastPrimaryLayoutName[guiLayoutStringSize];
+static WCHAR gwsLastSecondaryLayoutName[guiLayoutStringSize];
 
 // Hook pointers.
 static volatile HINSTANCE ghInstDLL = NULL;
 static volatile HHOOK ghFilterHook = NULL;
+static volatile UINT guiDLLRefCount = 0;
 
 // Filter maps and states.
 static volatile bool gabDidIMakeKeyCode[256];
@@ -67,13 +71,14 @@ static volatile UINT guiLastVKeyDown = 0;
 // Special key states
 static volatile bool gIsControlDown = false;
 static volatile bool gIsAltDown = false;
-static volatile bool gIsLeftWinDown = false;
-static volatile bool gIsRightWinDown = false;
+static volatile bool gIsWinDown = false;
+static volatile bool gIsShiftDown = false;
 static volatile bool gIsScrollLockEnabled = false;
 
 // Should we filter these keys?
 static volatile bool gIsControlFiltered = true;
 static volatile bool gIsAltFiltered = true;
+static volatile bool gIsWinFiltered = true;
 static volatile bool gIsScrollLockToggleEnabled = true;
 static volatile bool gIsScrollLockRemoved = true;
 
@@ -85,11 +90,46 @@ static volatile bool gIsScrollLockRemoved = true;
 
 #pragma unmanaged
 
-bool IsSpecialKeyPressed()
+#ifdef _DEBUG
+void DebugLog(const wchar_t *text)
+{
+	OutputDebugString(text);
+}
+
+void DebugLogN(const wchar_t *text, UINT n)
+{
+	wchar_t buf[1024];
+	_snwprintf_s(buf, 1024, _TRUNCATE, L"%s 0x%04x\n", text, n);
+	OutputDebugString(buf);
+}
+
+void DebugLogN2(const wchar_t *text, UINT n, UINT n2)
+{
+	wchar_t buf[1024];
+	_snwprintf_s(buf, 1024, _TRUNCATE, L"%s 0x%04x 0x%04x\n", text, n, n2);
+	OutputDebugString(buf);
+}
+
+void DebugLogN3(const wchar_t *text, UINT n, UINT n2, UINT n3)
+{
+	wchar_t buf[1024];
+	_snwprintf_s(buf, 1024, _TRUNCATE, L"%s 0x%04x 0x%04x 0x%04x\n", text, n, n2, n3);
+	OutputDebugString(buf);
+}
+
+#else
+#define DebugLog(x)
+#define DebugLogN(x, n)
+#define DebugLogN2(x, n, n2)
+#define DebugLogN3(x, n, n2, n3)
+#endif
+
+bool inline IsSpecialKeyPressed()
 {
 	// First test the special keys
 	if (((gIsControlFiltered & gIsControlDown) != false)
 		|| ((gIsAltFiltered & gIsAltDown) != false)
+		|| ((gIsWinFiltered & gIsWinDown) != false)
 		|| ((gIsScrollLockToggleEnabled & gIsScrollLockEnabled) != false))
 	{
 		return true;
@@ -133,80 +173,97 @@ bool SendFilteredKeyInput(UINT uiUnFilteredVKey, bool IsKeyDown)
 	return true;
 }
 
-bool FilterTheKeys(int iCode, UINT uiVirtualKey, UINT uiKeyFlags)
+bool FilterTheKeysLL(WPARAM KeyMsg, KBDLLHOOKSTRUCT* KbdInfo)
 {
-	bool IsThisKeyDown = (uiKeyFlags & (1 << 31)) == 0;
+	if (KbdInfo == NULL)
+		return false;
+
+	bool IsThisKeyDown = (KbdInfo->flags & LLKHF_UP) == 0 ? true : false;
+
+	DebugLogN3(L"Hook encountered -- KeyMsg, vkCode, Keydown: ", (UINT) KeyMsg, KbdInfo->vkCode, (UINT) IsThisKeyDown);
 	
-	switch (uiVirtualKey)
+	switch (KbdInfo->vkCode)
 	{
 		// here we keep up with the special keys.
-		case VK_CONTROL:
-			gIsControlDown = IsThisKeyDown;
-			if ((IsSpecialKeyPressed() == false) && (guiLastVKeyDown != 0))
-			{
-				SendFilteredKeyInput(guiLastVKeyDown, false);
-			}
-			break;
+	case VK_LCONTROL:
+	case VK_RCONTROL:
+	case VK_CONTROL:
+		gIsControlDown = IsThisKeyDown;
+		if ((IsSpecialKeyPressed() == false) && (guiLastVKeyDown != 0))
+		{
+			SendFilteredKeyInput(guiLastVKeyDown, false);
+		}
+		break;
 
-		case VK_MENU:
-			gIsAltDown = IsThisKeyDown;
-			if ((IsSpecialKeyPressed() == false) && (guiLastVKeyDown != 0))
-			{
-				SendFilteredKeyInput(guiLastVKeyDown, false);
-			}
-			break;
+	case VK_LMENU:
+	case VK_RMENU:
+	case VK_MENU:
+		gIsAltDown = IsThisKeyDown;
+		if ((IsSpecialKeyPressed() == false) && (guiLastVKeyDown != 0))
+		{
+			SendFilteredKeyInput(guiLastVKeyDown, false);
+		}
+		break;
 
-		case VK_LWIN:
-			gIsLeftWinDown = IsThisKeyDown;
-			break;
+	case VK_LWIN:
+	case VK_RWIN:
+		gIsWinDown = IsThisKeyDown;
+		if ((IsSpecialKeyPressed() == false) && (guiLastVKeyDown != 0))
+		{
+			SendFilteredKeyInput(guiLastVKeyDown, false);
+		}
+		break;
 
-		case VK_RWIN:
-			gIsRightWinDown = IsThisKeyDown;
-			break;
+	case VK_LSHIFT:
+	case VK_RSHIFT:
+	case VK_SHIFT:
+		gIsShiftDown = IsThisKeyDown;
+		break;
 
-		case VK_SCROLL:
+	case VK_SCROLL:
+		if (!gIsShiftDown)
+		{
+			//No shift key.
 			if (IsThisKeyDown != false)
 				gIsScrollLockEnabled = !gIsScrollLockEnabled;
 			if (gIsScrollLockRemoved)
 				return 1;
-			break;
+		}
+		break;
 
 		// here we filter.
-		default:
-			if (gabDidIMakeKeyCode[uiVirtualKey] != false)
+	default:
+		if (gabDidIMakeKeyCode[KbdInfo->vkCode] != false)
+		{
+			gabDidIMakeKeyCode[KbdInfo->vkCode] = false;
+		}
+		else
+		{
+			if ((IsSpecialKeyPressed() != false) && (gauiFilterVKeyMap[KbdInfo->vkCode] != 0))
 			{
-				// We created this key code, ignore it.
-				if (iCode != HC_NOREMOVE)
+				if (SendFilteredKeyInput(KbdInfo->vkCode, IsThisKeyDown))
 				{
-					gabDidIMakeKeyCode[uiVirtualKey] = false;
+					return true;
 				}
 			}
-			else
-			{
-				if ((IsSpecialKeyPressed() != false) && (gauiFilterVKeyMap[uiVirtualKey] != 0))
-				{	
-					if (SendFilteredKeyInput(uiVirtualKey, IsThisKeyDown))
-					{
-						return true;
-					}
-				}
-			}
-			break;
+		}
+		break;
 	}
 
 	return false;
 }
 
-LRESULT CALLBACK DQDOSKeyFilter(int code, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK DQDOSKeyFilterLL(int iCode, WPARAM wParam, LPARAM lParam)
 {
-	
-	if (code >= 0)
+	if (iCode == HC_ACTION)
 	{
-		if ((wparam <= 0xff) && (FilterTheKeys(code, (UINT)wparam, (UINT)lparam) != false))
+		KBDLLHOOKSTRUCT* KbdInfo = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
+
+		if ((KbdInfo->vkCode <= 0xff) && (FilterTheKeysLL(wParam, KbdInfo) != false))
 			return 1;
 	}
 
-	return CallNextHookEx(ghFilterHook, code, wparam, lparam);
+	return CallNextHookEx(ghFilterHook, iCode, wParam, lParam);
 }
 
 bool CreateFilterMap()
@@ -239,13 +296,8 @@ bool CreateFilterMap()
 		gauiFilterVKeyMap[i] = 0;
 		gauiFilterScanKeyMap[i] = 0;
 		
-		// Lookup filters for the keys we care about -- "ASCII" ones such as A-Z, 0-9, standard punctuation. 
-		// TODO: Test mapping every code. Does it matter to limit like this?
-		if (((i >= 0x30) && (i <= 0x39))
-			|| ((i >= 0x41) && (i <= 0x5A))
-			|| ((i >= 0xBA) && (i <= 0xC0))
-			|| ((i >= 0xDB) && (i <= 0xDF))
-			|| (i == 0xE2))
+		// Lookup filters for various keys  
+		if ((i >= 0x30) && (i <= 0xfe))
 		{
 			uiQwKey = MapVirtualKeyEx((UINT)i, MAPVK_VK_TO_VSC, gPrimaryHKL);
 			uiDvKey = MapVirtualKeyEx(uiQwKey, MAPVK_VSC_TO_VK, gSecondaryHKL);
@@ -278,17 +330,18 @@ bool EnableFilterHook()
 {
 	// Turn on the key filter.
 
-	// Disable here for two reasons -- if an error is present, the hook is 
-	// NOT set. Also, we avoid weird interim states while the map is created.
-	if (DisableFilterHook() == false)
+	// Input validation, we need a DLL instance and the hook should be disabled already.
+	if ((ghFilterHook != NULL) || (ghInstDLL == 0))
 		return false;
 
 	// Create a filter map, if this fails, we don't bother to enable the hook function.
 	if (CreateFilterMap() == false)
 		return false;
 
-	ghFilterHook = SetWindowsHookEx(WH_KEYBOARD, DQDOSKeyFilter, ghInstDLL, 0);
+	gIsScrollLockEnabled = false;
 
+	ghFilterHook = SetWindowsHookEx(WH_KEYBOARD_LL, DQDOSKeyFilterLL, ghInstDLL, 0);
+	
 	if (ghFilterHook == NULL)
 		return false;
 
@@ -297,7 +350,7 @@ bool EnableFilterHook()
 
 #pragma managed
 
-bool ChangeKeyboardLayout(LPCWSTR pwsPrimaryLayoutName, LPCWSTR pwsSecondaryLayoutName)
+bool ChangeKeyboardLayout(LPCWSTR pwsPrimaryLayoutName, LPCWSTR pwsSecondaryLayoutName, bool bEnableFilter)
 {
 	// Sets the keyboard layouts as requested, ensuring primary is the active layout.
 	// Unloads any layouts no longer needed.
@@ -311,6 +364,10 @@ bool ChangeKeyboardLayout(LPCWSTR pwsPrimaryLayoutName, LPCWSTR pwsSecondaryLayo
 
 	// Test inputs
 	if ((pwsPrimaryLayoutName == NULL) || (*pwsPrimaryLayoutName == '\0'))
+		return false;
+
+	// Disable any current hook first.
+	if (DisableFilterHook() == false)
 		return false;
 
 	// First, load the secondary layout (if necessary).
@@ -334,8 +391,17 @@ bool ChangeKeyboardLayout(LPCWSTR pwsPrimaryLayoutName, LPCWSTR pwsSecondaryLayo
 	PostMessage(HWND_BROADCAST, WM_INPUTLANGCHANGEREQUEST, 0, (LPARAM)MyHKL);
 	SystemParametersInfo(SPI_SETDEFAULTINPUTLANG, 0, (void *)&MyHKL, SPIF_SENDCHANGE);
 
-	// Unload unneeded layouts if it changed (this ensures all processes accept the new layout).
-	if ((OrigHKL != gPrimaryHKL) && (OrigHKL != gSecondaryHKL))
+	// Layouts are set, now we can enable the hook (which also creates the map).
+	if ((bEnableFilter) && (gSecondaryHKL != 0))
+		EnableFilterHook();
+
+	// Unload unneeded layouts if it changed (this ensures all processes see only the new layout, otherwise
+	// they sometimes like to pick the secondary layout).
+	if (gSecondaryHKL != 0)
+	{
+		UnloadKeyboardLayout(gSecondaryHKL);
+	}
+	if ((OrigHKL != 0) && (OrigHKL != gPrimaryHKL) && (OrigHKL != gSecondaryHKL))
 	{
 		UnloadKeyboardLayout(OrigHKL);
 	}
@@ -343,7 +409,17 @@ bool ChangeKeyboardLayout(LPCWSTR pwsPrimaryLayoutName, LPCWSTR pwsSecondaryLayo
 	{
 		UnloadKeyboardLayout(OrigSecHKL);
 	}
-		
+	
+	wcscpy_s(gwsLastPrimaryLayoutName, SizeOfArray(gwsLastPrimaryLayoutName), pwsPrimaryLayoutName);
+	if (pwsSecondaryLayoutName != NULL)
+	{
+		wcscpy_s(gwsLastSecondaryLayoutName, SizeOfArray(gwsLastSecondaryLayoutName), pwsSecondaryLayoutName);
+	}
+	else
+	{
+		gwsLastSecondaryLayoutName[0] = L'\0';
+	}
+
 	return true;
 }
 	
@@ -357,6 +433,18 @@ Int32 DQGetKeyboardLayoutBufferSize()
 tKeyboardMode DQGetLastKeyboardMode()
 {
 	return geLastKeyboardMode;
+}
+
+// external
+bool DQGetLastKeyboardLayouts(int iLayoutSize, LPWSTR pwsPrimaryLayout, LPWSTR pwsSecondaryLayout)
+{
+	if (iLayoutSize < KL_NAMELENGTH + 1)
+		return false;
+
+	wcscpy_s(pwsPrimaryLayout, iLayoutSize, gwsLastPrimaryLayoutName);
+	wcscpy_s(pwsPrimaryLayout, iLayoutSize, gwsLastSecondaryLayoutName);
+
+	return true;
 }
 
 // external
@@ -374,22 +462,19 @@ bool DQSetKeyboardMode(tKeyboardMode KeyboardMode, LPCWSTR pwsPrimaryLayout, LPC
 	switch (KeyboardMode)
 	{
 		case DvorakQwerty:
-			Result = ChangeKeyboardLayout(pwsPrimaryLayout, pwsSecondaryLayout);
+			Result = ChangeKeyboardLayout(pwsPrimaryLayout, pwsSecondaryLayout, true);
 			if (Result == false)
 				return false;
-			EnableFilterHook();
 			break;
 
 		case DvorakOnly:
-			DisableFilterHook();
-			Result = ChangeKeyboardLayout(pwsPrimaryLayout, NULL);
+			Result = ChangeKeyboardLayout(pwsPrimaryLayout, NULL, false);
 			if (Result == false)
 				return false;
 			break;
 
 		case Disabled:
-			DisableFilterHook();
-			Result = ChangeKeyboardLayout(pwsSecondaryLayout, NULL);
+			Result = ChangeKeyboardLayout(pwsSecondaryLayout, NULL, false);
 			if (Result == false)
 				return false;
 			break;
@@ -421,15 +506,23 @@ bool DQGetCurrentKeyboardLayout(int iLayoutSize, LPWSTR pwsLayoutName)
 }
 
 // external
-bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsScrollLockQwertyEnabled, bool IsScrollLockDisabled)
+bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsWinFiltered, bool IsScrollLockQwertyEnabled, bool IsScrollLockDisabled)
 {
 	gIsControlFiltered = IsControlFiltered;
 	gIsAltFiltered = IsAltFiltered;
+	gIsWinFiltered = IsWinFiltered;
 	gIsScrollLockToggleEnabled = IsScrollLockQwertyEnabled;
 	gIsScrollLockRemoved = IsScrollLockDisabled;
 
 	return true;
 }
+
+//external
+UINT DQGetNumberAttachedProcs()
+{
+	return guiDLLRefCount;
+}
+
 
 } // namespace DQDOSKeyboard
 
@@ -440,11 +533,26 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 	switch (fdwReason)
 	{
 	case DLL_PROCESS_DETACH:
-		DQDOSKeyboard::DisableFilterHook();
+		// Do nothing, when main process is closed, the DLL will be unhooked.
+		if (DQDOSKeyboard::guiDLLRefCount > 1)
+		{
+			DQDOSKeyboard::guiDLLRefCount--;
+		}
+		else
+		{
+			DQDOSKeyboard::guiDLLRefCount = 0;
+			DQDOSKeyboard::DisableFilterHook();
+		}
 		break;
 
 	case DLL_PROCESS_ATTACH:
-		DQDOSKeyboard::ghInstDLL = hinstDLL;
+		DQDOSKeyboard::guiDLLRefCount++;
+		if (DQDOSKeyboard::guiDLLRefCount == 1)
+		{
+			DQDOSKeyboard::ghInstDLL = hinstDLL;
+			DQDOSKeyboard::gwsLastPrimaryLayoutName[0] = L'\0';
+			DQDOSKeyboard::gwsLastSecondaryLayoutName[0] = L'\0';
+		}
 		break;
 
 	default:

@@ -91,6 +91,30 @@ namespace DQDOS
             return DQSetKeyboardMode(Mode, PrimaryLayout, SecondaryLayout);
         }
 
+        public static void GetLastKeyboardLayouts(out String PrimaryLayoutName, out String SecondaryLayoutName)
+        {
+            int iBufferSize = (int)DQGetKeyboardLayoutBufferSize();
+            StringBuilder PriMarshalStr = null;
+            StringBuilder SecMarshalStr = null;
+            bool Result = false;
+
+            PriMarshalStr = new StringBuilder(iBufferSize);
+            SecMarshalStr = new StringBuilder(iBufferSize);
+
+            Result = DQGetLastKeyboardLayouts(iBufferSize, PriMarshalStr, SecMarshalStr);
+            if (Result != false)
+            {
+                PrimaryLayoutName = PriMarshalStr.ToString();
+                SecondaryLayoutName = SecMarshalStr.ToString();
+            }
+            else
+            {
+                PrimaryLayoutName = "";
+                SecondaryLayoutName = "";
+            }
+            
+        }
+
         public static String GetCurrentKeyboardLayout()
         {
             int iBufferSize = (int) DQGetKeyboardLayoutBufferSize();
@@ -108,9 +132,14 @@ namespace DQDOS
             return null;
         }
 
-        public static bool SetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsScrollLockQwertyEnabled, bool IsScrollLockDisabled)
+        public static bool SetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsWinFiltered, bool IsScrollLockQwertyEnabled, bool IsScrollLockDisabled)
         {
-            return DQSetFilteredSpecialKeys(IsControlFiltered, IsAltFiltered, IsScrollLockQwertyEnabled, IsScrollLockDisabled);
+            return DQSetFilteredSpecialKeys(IsControlFiltered, IsAltFiltered, IsWinFiltered, IsScrollLockQwertyEnabled, IsScrollLockDisabled);
+        }
+
+        public static uint GetNumberAttachedProcs()
+        {
+            return DQGetNumberAttachedProcs();
         }
 
         [DllImport("DQDOSKeyboard.dll")]
@@ -125,9 +154,15 @@ namespace DQDOS
             [MarshalAs(UnmanagedType.LPWStr)] String pwsSecondaryLayout);
 
         [DllImport("DQDOSKeyboard.dll", CharSet = CharSet.Unicode)]
+        private static extern bool DQGetLastKeyboardLayouts(int iLayoutSize, StringBuilder pwsPrimaryLayout, StringBuilder pwsSecondaryLayout);
+
+        [DllImport("DQDOSKeyboard.dll", CharSet = CharSet.Unicode)]
         private static extern bool DQGetCurrentKeyboardLayout(int iLayoutSize, StringBuilder pwsLayoutName);
 
         [DllImport("DQDOSKeyboard.dll")]
-        private static extern bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsScrollLockQwertyEnabled, bool IsScrollLockDisabled);
+        private static extern bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsWinFiltered, bool IsScrollLockQwertyEnabled, bool IsScrollLockDisabled);
+
+        [DllImport("DQDOSKeyboard.dll")]
+        private static extern uint DQGetNumberAttachedProcs();
     }
 }
