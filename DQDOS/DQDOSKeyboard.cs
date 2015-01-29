@@ -137,6 +137,11 @@ namespace DQDOS
             return DQSetFilteredSpecialKeys(IsControlFiltered, IsAltFiltered, IsWinFiltered, IsScrollLockQwertyEnabled, IsScrollLockDisabled);
         }
 
+        public static bool ResetSpecialKeys()
+        {
+            return DQResetSpecialKeys();
+        }
+
         public static uint GetNumberAttachedProcs()
         {
             return DQGetNumberAttachedProcs();
@@ -161,6 +166,9 @@ namespace DQDOS
 
         [DllImport("DQDOSKeyboard.dll")]
         private static extern bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool IsWinFiltered, bool IsScrollLockQwertyEnabled, bool IsScrollLockDisabled);
+
+        [DllImport("DQDOSKeyboard.dll")]
+        private static extern bool DQResetSpecialKeys();
 
         [DllImport("DQDOSKeyboard.dll")]
         private static extern uint DQGetNumberAttachedProcs();

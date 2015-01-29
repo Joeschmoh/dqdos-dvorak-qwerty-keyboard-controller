@@ -249,6 +249,11 @@ namespace DQDOS
             this.Close();
         }
 
+        public void DQSystemUnlock()
+        {
+            DQDOSKeyboard.ResetSpecialKeys();
+        }
+
         public void DoHiddenWarningBubble()
         {
             DQNotifyIcon.ShowBalloonTip(15000, "DQDOS", "DQDOS is still running and has moved to your tray. Click the icon to change settings or re-open.", ToolTipIcon.Info);

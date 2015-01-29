@@ -517,6 +517,19 @@ bool DQSetFilteredSpecialKeys(bool IsControlFiltered, bool IsAltFiltered, bool I
 	return true;
 }
 
+// external 
+bool DQResetSpecialKeys()
+{
+	// reset state of special keys to "false" or "up" -- used for screen locks / unlocks so that a key held when locked or disconnected isn't still "down".
+
+	gIsAltDown = false;
+	gIsControlDown = false;
+	gIsScrollLockEnabled = false;
+	gIsWinDown = false;
+
+	return true;
+}
+
 //external
 UINT DQGetNumberAttachedProcs()
 {

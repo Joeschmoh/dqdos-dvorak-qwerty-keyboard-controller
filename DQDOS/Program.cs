@@ -57,10 +57,12 @@ namespace DQDOS
                 MainForm.DQLoadAppSettings();
 
                 SystemEvents.SessionEnded += SystemEvents_SessionEnded;
+                SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
 
                 Application.Run();
 
                 SystemEvents.SessionEnded -= SystemEvents_SessionEnded;
+                SystemEvents.SessionSwitch -= SystemEvents_SessionSwitch;
             }
             else
             {
@@ -69,10 +71,27 @@ namespace DQDOS
             }
         }
 
+        static void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
+        {
+ 	        switch (e.Reason)
+            {
+                case SessionSwitchReason.ConsoleConnect:
+                case SessionSwitchReason.RemoteConnect:
+                case SessionSwitchReason.SessionUnlock:
+                    MainForm.DQSystemUnlock();
+                    break;
+
+                default:
+                    // do nothing...
+                    break;
+            }
+        }
+
         static void SystemEvents_SessionEnded(object sender, SessionEndedEventArgs e)
         {
             // This tells the GUI user has logged out, rebooted, or shutdown and we need to exit immediately (without confirmation).
             MainForm.DQSystemShutdown();
         }
+        
     }
 }
